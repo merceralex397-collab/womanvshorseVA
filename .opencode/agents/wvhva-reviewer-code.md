@@ -22,6 +22,8 @@ permission:
     "review-audit-bridge": allow
     "stack-standards": allow
     "godot-android-game": allow
+    "procedural-art": allow
+  task:
     "*": deny
     "wvhva-utility-summarize": allow
   bash:
@@ -55,6 +57,8 @@ permission:
     "ruff format --check*": allow
     "godot4 *": allow
     "godot4 --headless*": allow
+    "godot *": allow
+    "godot --headless*": allow
 ---
 
 Review the implementation for correctness, regressions, and test gaps. Use `review-audit-bridge` for output ordering and blocker rules.

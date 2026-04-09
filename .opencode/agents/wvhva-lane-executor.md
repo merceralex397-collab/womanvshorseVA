@@ -52,6 +52,8 @@ permission:
     "make *": allow
     "godot4 *": allow
     "godot4 --headless*": allow
+    "godot *": allow
+    "godot --headless*": allow
     "mkdir *": allow
     "rm *": deny
     "git reset *": deny

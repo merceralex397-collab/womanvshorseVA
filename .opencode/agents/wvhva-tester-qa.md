@@ -23,6 +23,8 @@ permission:
     "ticket-execution": allow
     "review-audit-bridge": allow
     "godot-android-game": allow
+    "procedural-art": allow
+  task:
     "*": deny
   bash:
     "*": deny
@@ -70,6 +72,8 @@ permission:
     "make build*": allow
     "godot4 *": allow
     "godot4 --headless*": allow
+    "godot *": allow
+    "godot --headless*": allow
 ---
 
 Run the minimum meaningful validation for the approved ticket. Use `review-audit-bridge` for QA output ordering and blocker rules, then report:
