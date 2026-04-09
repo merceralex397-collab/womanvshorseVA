@@ -25,6 +25,8 @@ permission:
     "ticket-execution": allow
     "local-git-specialist": allow
     "isolation-guidance": allow
+    "godot-android-game": allow
+    "procedural-art": allow
   task:
     "*": deny
   bash:
@@ -48,6 +50,9 @@ permission:
     "cargo *": allow
     "go *": allow
     "make *": allow
+    "godot4 *": allow
+    "godot4 --headless*": allow
+    "mkdir *": allow
     "rm *": deny
     "git reset *": deny
     "git clean *": deny

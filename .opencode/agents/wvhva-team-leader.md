@@ -37,6 +37,8 @@ permission:
     "research-delegation": allow
     "local-git-specialist": allow
     "isolation-guidance": allow
+    "godot-android-game": allow
+    "procedural-art": allow
   task:
     "*": deny
     "explore": allow
@@ -280,3 +282,20 @@ When this project targets Android (Godot game):
    - `JAVA_HOME`: check `echo $JAVA_HOME` or `/etc/profile.d/java.sh`
    - `ANDROID_HOME`: check `echo $ANDROID_HOME`
    - Debug keystore: check editor settings at `~/.config/godot/editor_settings-*.tres`
+
+## Game Design Context
+
+This is a 2D top-down arena action game: a warrior woman fights waves of enemy horses.
+
+**Key design decisions** (see `docs/spec/CANONICAL-BRIEF.md` for full spec):
+- All visuals are procedural colored shapes (no imported assets). Use the `procedural-art` skill for rendering recipes.
+- Player: green rectangle + white triangle sword, 3 HP hearts, 8-dir joystick movement
+- Enemies: colored rectangles (brown/black/red/gold) with increasing difficulty per wave
+- Touch controls: left half = virtual joystick, right half tap = melee, right half hold = ranged
+- Single scene with state machine: Title → Playing → GameOver
+
+**When delegating game implementation work**, always include in the brief:
+- Reference to `godot-android-game` skill for scene tree patterns and GDScript conventions
+- Reference to `procedural-art` skill for specific rendering recipes and color values
+- The exact collision layer assignments (Player=1, Enemies=2, PlayerAttack=3, EnemyAttack=4, Arena=5)
+- The validation command: `godot4 --headless --quit` for project load checks

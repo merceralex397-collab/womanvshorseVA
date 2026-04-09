@@ -25,6 +25,8 @@ permission:
     "ticket-execution": allow
     "research-delegation": allow
     "isolation-guidance": allow
+    "godot-android-game": allow
+    "procedural-art": allow
   task:
     "*": deny
     "explore": allow

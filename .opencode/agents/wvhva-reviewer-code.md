@@ -20,7 +20,8 @@ permission:
     "project-context": allow
     "ticket-execution": allow
     "review-audit-bridge": allow
-  task:
+    "stack-standards": allow
+    "godot-android-game": allow
     "*": deny
     "wvhva-utility-summarize": allow
   bash:
@@ -52,6 +53,8 @@ permission:
     "tsc --noEmit*": allow
     "ruff check*": allow
     "ruff format --check*": allow
+    "godot4 *": allow
+    "godot4 --headless*": allow
 ---
 
 Review the implementation for correctness, regressions, and test gaps. Use `review-audit-bridge` for output ordering and blocker rules.

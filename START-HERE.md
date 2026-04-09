@@ -3,11 +3,11 @@
 <!-- SCAFFORGE:START_HERE_BLOCK START -->
 ## What This Repo Is
 
-Woman vs Horse VA
+Woman vs Horse VA — a 2D top-down arena action game for Android where a warrior woman fights waves of enemy horses. Built with Godot 4.6, using procedural/programmatic sprites (colored shapes). Touch controls. Single scene architecture.
 
 ## Current State
 
-The repo is operating under the managed OpenCode workflow. Use the canonical state files below instead of memory or raw ticket prose, and keep the single-lane-first execution posture unless bounded parallel work is explicitly justified.
+Scaffold complete. Skills, agents, and ticket pack are populated with game-specific content. The repo is ready to begin implementation through the managed OpenCode workflow. Bootstrap has not yet been verified — the first ticket should run `environment_bootstrap` to confirm Godot 4.6 and Android SDK availability.
 
 ## Read In This Order
 
@@ -22,9 +22,9 @@ The repo is operating under the managed OpenCode workflow. Use the canonical sta
 ## Current Or Next Ticket
 
 - ID: SETUP-001
-- Title: Bootstrap environment and confirm scaffold readiness
+- Title: Create main scene with arena
 - Wave: 0
-- Lane: repo-foundation
+- Lane: scene-foundation
 - Stage: planning
 - Status: todo
 - Resolution: open
@@ -33,12 +33,12 @@ The repo is operating under the managed OpenCode workflow. Use the canonical sta
 ## Dependency Status
 
 - current_ticket_done: no
-- dependent_tickets_waiting_on_current: none
+- dependent_tickets_waiting_on_current: SETUP-002, CORE-002, CORE-004, UI-001, UI-002
 - split_child_tickets: none
 
 ## Generation Status
 
-- handoff_status: bootstrap recovery required
+- handoff_status: scaffold complete — skills, agents, and tickets populated
 - process_version: 7
 - parallel_mode: sequential
 - pending_process_verification: false
@@ -61,11 +61,12 @@ The repo is operating under the managed OpenCode workflow. Use the canonical sta
 
 ## Known Risks
 
+- Bootstrap not yet verified — godot4 and Android SDK availability must be confirmed before implementation work.
 - Validation can fail for environment reasons until bootstrap proof exists.
 - Historical completion should not be treated as current trust once defects or process drift are discovered.
 - Delegation mistakes can cause lifecycle loops; check `docs/AGENT-DELEGATION.md` before improvising a new handoff path.
 
 ## Next Action
 
-Run `environment_bootstrap`, register its proof artifact, rerun `ticket_lookup`, and do not continue lifecycle work until bootstrap is ready.
+Run `environment_bootstrap` to verify Godot 4.6 and Android SDK availability. Then claim SETUP-001 and begin planning the main scene and arena.
 <!-- SCAFFORGE:START_HERE_BLOCK END -->

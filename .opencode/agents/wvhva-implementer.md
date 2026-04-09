@@ -25,7 +25,8 @@ permission:
     "ticket-execution": allow
     "local-git-specialist": allow
     "isolation-guidance": allow
-  task:
+    "godot-android-game": allow
+    "procedural-art": allow
     "*": deny
   bash:
     "*": deny
@@ -49,6 +50,9 @@ permission:
     "cargo *": allow
     "go *": allow
     "make *": allow
+    "godot4 *": allow
+    "godot4 --headless*": allow
+    "mkdir *": allow
     "rm *": deny
     "git reset *": deny
     "git clean *": deny
@@ -86,7 +90,16 @@ Stack-specific notes:
 `opencode-team-bootstrap` must rewrite this section with project-specific build, verification, pitfalls, and configuration-file guidance before implementation begins.
 
 <!-- SCAFFORGE:STACK_SPECIFIC_IMPLEMENTATION_NOTES START -->
-- Pending project-specific stack notes.
+- **Engine**: Godot 4.6 — GDScript only, no C# or GDExtension
+- **Art pipeline**: All visuals procedurally generated via GDScript (Polygon2D, `_draw()`). No image/audio assets. Load the `procedural-art` skill for rendering recipes.
+- **Scene architecture**: Single main scene (`scenes/main.tscn`) with state machine (Title → Playing → GameOver). Load the `godot-android-game` skill for the canonical scene tree pattern.
+- **GDScript version**: Godot 4.x syntax only (`@export`, `@onready`, `class_name`, `await`). Never use Godot 3.x patterns.
+- **Validation**: Run `godot4 --headless --quit` to verify project loads. Run `godot4 --headless --check-only --script res://scripts/<file>.gd` for syntax checks on new/modified scripts.
+- **Export**: Debug APK built with `godot4 --headless --export-debug "Android Debug" build/android/womanvshorseva-debug.apk`
+- **Touch controls**: Virtual joystick (left half) + attack zones (right half). Use `InputEventScreenTouch`/`InputEventScreenDrag` with touch index tracking for multi-touch.
+- **Collision layers**: Player=1, Enemies=2, PlayerAttack=3, EnemyAttack=4, Arena=5
+- **Performance**: Keep node count under 200. Use `queue_redraw()` only on state change. Pool projectiles/particles if >30 simultaneous.
+- **Zero dependencies**: No addons, no asset packs, no third-party plugins.
 <!-- SCAFFORGE:STACK_SPECIFIC_IMPLEMENTATION_NOTES END -->
 
 Rules:
