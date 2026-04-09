@@ -1,0 +1,85 @@
+{
+  "version": 3,
+  "project": "Woman vs Horse VA",
+  "active_ticket": "SETUP-001",
+  "tickets": [
+    {
+      "id": "SETUP-001",
+      "title": "Bootstrap environment and confirm scaffold readiness",
+      "wave": 0,
+      "lane": "repo-foundation",
+      "parallel_safe": false,
+      "overlap_risk": "high",
+      "stage": "planning",
+      "status": "todo",
+      "resolution_state": "open",
+      "verification_state": "suspect",
+      "depends_on": [],
+      "source_ticket_id": null,
+      "follow_up_ticket_ids": [],
+      "summary": "Confirm runtime and toolchain prerequisites, install project and test dependencies, verify validation commands can run in this environment, and replace scaffold placeholders before deeper implementation work begins.",
+      "acceptance": [
+        "Runtime and required toolchain executables are present or the gap is explicitly reported",
+        "Project dependencies are installed using repo-appropriate Ubuntu-safe commands",
+        "Test dependencies are installed using repo-appropriate Ubuntu-safe commands",
+        "Canonical validation commands are identified and can be executed from the repo root",
+        "Canonical brief updated with real project content",
+        "Team entrypoints and ticket tools verified"
+      ],
+      "decision_blockers": [],
+      "artifacts": []
+    },
+    {
+      "id": "ANDROID-001",
+      "title": "Create Android export surfaces",
+      "wave": 2,
+      "lane": "android-export",
+      "parallel_safe": false,
+      "overlap_risk": "high",
+      "stage": "planning",
+      "status": "todo",
+      "resolution_state": "open",
+      "verification_state": "suspect",
+      "depends_on": [
+        "SETUP-001"
+      ],
+      "source_ticket_id": null,
+      "follow_up_ticket_ids": [
+        "RELEASE-001"
+      ],
+      "summary": "Create and validate the repo-local Android export surfaces for this Godot Android target, including export_presets.cfg, android/ support files, and the canonical debug export command.",
+      "acceptance": [
+        "export_presets.cfg exists at repo root and defines an Android preset",
+        "Repo-local android support surfaces exist and are not placeholder content",
+        "The canonical Godot Android debug export target is build/android/womanvshorseva-debug.apk"
+      ],
+      "decision_blockers": [],
+      "artifacts": []
+    },
+    {
+      "id": "RELEASE-001",
+      "title": "Build Android debug APK",
+      "wave": 3,
+      "lane": "release-readiness",
+      "parallel_safe": false,
+      "overlap_risk": "high",
+      "stage": "planning",
+      "status": "todo",
+      "resolution_state": "open",
+      "verification_state": "suspect",
+      "depends_on": [],
+      "source_ticket_id": "ANDROID-001",
+      "follow_up_ticket_ids": [],
+      "source_mode": "split_scope",
+      "split_kind": "sequential_dependent",
+      "summary": "Produce and validate the canonical Android debug APK at build/android/womanvshorseva-debug.apk using the repo-managed Godot Android export surfaces.",
+      "acceptance": [
+        "A debug APK is produced at build/android/womanvshorseva-debug.apk or the exact blocker is recorded with command evidence",
+        "The APK build uses the Android export surfaces owned by ANDROID-001",
+        "Release-readiness evidence names the exact export command and outcome"
+      ],
+      "decision_blockers": [],
+      "artifacts": []
+    }
+  ]
+}

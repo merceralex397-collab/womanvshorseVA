@@ -1,0 +1,75 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7",
+  "default_agent": "wvhva-team-leader",
+  "instructions": [
+    "START-HERE.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/process/*.md",
+    "docs/spec/CANONICAL-BRIEF.md",
+    "tickets/README.md",
+    "tickets/manifest.json",
+    "tickets/BOARD.md"
+  ],
+  "mcp": {
+    "browser_research": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": false
+    },
+    "openai_docs": {
+      "type": "remote",
+      "url": "https://developers.openai.com/mcp",
+      "enabled": false
+    }
+  },
+  "permission": {
+    "external_directory": "allow",
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow",
+      "**/*.env": "deny",
+      "**/*.env.*": "deny",
+      "**/*.env.example": "allow"
+    },
+    "bash": {
+      "*": "deny",
+      "pwd": "allow",
+      "ls *": "allow",
+      "find *": "allow",
+      "rg *": "allow",
+      "sed *": "allow",
+      "cat *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "python *": "allow",
+      "python3 *": "allow",
+      "pytest *": "allow",
+      "uv *": "allow",
+      "ruff *": "allow",
+      "npm *": "allow",
+      "node *": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git add *": "allow",
+      "git commit *": "allow",
+      "mkdir *": "allow",
+      "echo *": "allow",
+      "touch *": "allow",
+      "cp *": "allow",
+      "mv *": "allow",
+      "godot4 *": "allow",
+      "godot *": "allow",
+      "java *": "allow",
+      "javac *": "allow",
+      "cargo *": "allow",
+      "rustc *": "allow",
+      "go *": "allow",
+      "dotnet *": "allow"
+    }
+  }
+}

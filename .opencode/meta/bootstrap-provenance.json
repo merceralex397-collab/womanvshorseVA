@@ -1,0 +1,91 @@
+{
+  "managed_repo": "/home/pc/projects/Scafforge",
+  "template_commit": "8e43aef27487f524ea93400d0a7a422afef78d71",
+  "template_commit_result": {
+    "success": true,
+    "commit": "8e43aef27487f524ea93400d0a7a422afef78d71",
+    "reason": null,
+    "detail": null
+  },
+  "template_asset_root": "skills/repo-scaffold-factory/assets/project-template",
+  "project_name": "Woman vs Horse VA",
+  "project_slug": "womanvshorseva",
+  "package_name": "com.example.womanvshorseva",
+  "agent_prefix": "wvhva",
+  "generation_scope": "full",
+  "runtime_models": {
+    "tier": "standard",
+    "provider": "minimax-coding-plan",
+    "planner": "minimax-coding-plan/MiniMax-M2.7",
+    "implementer": "minimax-coding-plan/MiniMax-M2.7",
+    "utility": "minimax-coding-plan/MiniMax-M2.7"
+  },
+  "stack_label": "Godot Android",
+  "deliverable_kind": "Android game APK \u2014 woman fights waves of enemy horses",
+  "deliverable_artifact_path": null,
+  "product_finish_contract": {
+    "deliverable_kind": "Android game APK \u2014 woman fights waves of enemy horses",
+    "placeholder_policy": "Procedural/programmatic sprites acceptable. Colored shapes with basic animations. No placeholder art in final build.",
+    "visual_finish_target": "2D top-down view with procedural sprites. Clean, readable gameplay. Inspired by Codex game-studio patterns.",
+    "audio_finish_target": "Minimal: procedural/generated SFX. Background music optional.",
+    "content_source_plan": "Procedural generation \u2014 sprites created programmatically via GDScript. No external assets.",
+    "licensing_or_provenance_constraints": "No external assets used. All content is procedurally generated.",
+    "finish_acceptance_signals": "APK compiles and installs. All waves playable. Touch controls work. Score tracking functions."
+  },
+  "bootstrap_steps": [
+    "repo-scaffold-factory/render-full-scaffold"
+  ],
+  "tracking": {
+    "invocation_log": ".opencode/state/invocation-log.jsonl",
+    "skill_ping_tool": "skill_ping",
+    "tracker_plugin": "invocation-tracker"
+  },
+  "workflow_contract": {
+    "process_version": 7,
+    "ticket_contract_version": 3,
+    "parallel_mode": "sequential",
+    "manager_hierarchy": {
+      "first_class_scaffold_profile": false,
+      "advanced_customization_allowed": true
+    },
+    "post_migration_verification": {
+      "enabled": true,
+      "backlog_verifier_agent": "wvhva-backlog-verifier",
+      "ticket_creator_agent": "wvhva-ticket-creator"
+    }
+  },
+  "managed_surfaces": {
+    "replace_on_retrofit": [
+      "opencode.jsonc",
+      ".opencode/tools",
+      ".opencode/plugins",
+      ".opencode/commands",
+      "scaffold-managed .opencode/skills",
+      "docs/process/workflow.md",
+      "docs/process/tooling.md",
+      "docs/process/model-matrix.md",
+      "docs/process/git-capability.md",
+      "START-HERE.md managed block"
+    ],
+    "project_specific_follow_up": [
+      ".opencode/skills",
+      ".opencode/agents",
+      "docs/process/agent-catalog.md"
+    ],
+    "preserve_project_sources": [
+      "docs/spec/CANONICAL-BRIEF.md",
+      "tickets/manifest.json",
+      "tickets/*.md",
+      ".opencode/state/artifacts",
+      ".opencode/state/bootstrap",
+      ".opencode/state/plans",
+      ".opencode/state/implementations",
+      ".opencode/state/reviews",
+      ".opencode/state/qa",
+      ".opencode/state/smoke-tests",
+      ".opencode/state/handoffs"
+    ]
+  },
+  "migration_history": [],
+  "repair_history": []
+}
