@@ -1,7 +1,7 @@
 ---
 description: Resume the current autonomous cycle using the latest repo state
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Resume from `tickets/manifest.json` and `.opencode/state/workflow-state.json` first. Use `START-HERE.md`, `.opencode/state/context-snapshot.md`, and `.opencode/state/latest-handoff.md` only as derived restart surfaces that must agree with canonical state.

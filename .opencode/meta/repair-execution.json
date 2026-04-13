@@ -1,0 +1,737 @@
+{
+  "repair_plan": {
+    "repo_root": "/home/pc/projects/womanvshorseVA",
+    "required_follow_on_stages": [
+      {
+        "stage": "project-skill-bootstrap",
+        "owner": "project-skill-bootstrap",
+        "category": "repo_local_skills",
+        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content."
+      },
+      {
+        "stage": "ticket-pack-builder",
+        "owner": "ticket-pack-builder",
+        "category": "ticket_follow_up",
+        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system."
+      }
+    ],
+    "replaced_surfaces": [
+      "opencode.jsonc",
+      ".opencode/tools",
+      ".opencode/lib",
+      ".opencode/plugins",
+      ".opencode/commands",
+      "scaffold-managed .opencode/skills",
+      ".opencode/agents",
+      "docs/process/workflow.md",
+      "docs/process/tooling.md",
+      "docs/process/model-matrix.md",
+      "docs/process/git-capability.md",
+      "tickets/manifest.json",
+      "START-HERE.md managed block",
+      ".opencode/state/context-snapshot.md",
+      ".opencode/state/latest-handoff.md"
+    ],
+    "diff_summary": {
+      "files_added": [],
+      "files_removed": [],
+      "files_modified": [
+        ".opencode/lib/workflow.ts",
+        ".opencode/skills/stack-standards/SKILL.md",
+        ".opencode/tools/smoke_test.ts",
+        "START-HERE.md",
+        "tickets/manifest.json"
+      ]
+    },
+    "backup_path": null,
+    "stale_surface_map": {
+      "workflow_tools_and_prompts": {
+        "status": "replace",
+        "surfaces": [
+          ".opencode/commands",
+          ".opencode/lib",
+          ".opencode/plugins",
+          ".opencode/tools",
+          "docs/process/git-capability.md",
+          "docs/process/model-matrix.md",
+          "docs/process/tooling.md",
+          "docs/process/workflow.md",
+          "opencode.jsonc"
+        ],
+        "reason": "Managed workflow tools, prompts, and process docs were refreshed or still show workflow drift."
+      },
+      "repo_local_skills": {
+        "status": "regenerate",
+        "surfaces": [
+          ".opencode/skills/stack-standards/SKILL.md",
+          "scaffold-managed .opencode/skills"
+        ],
+        "reason": "Repo-local skills need regeneration when scaffold-managed skills were replaced or placeholder/model drift remains.",
+        "finding_codes": [
+          "SKILL001"
+        ]
+      },
+      "agent_team_and_prompts": {
+        "status": "stable",
+        "surfaces": [],
+        "reason": "Agent-team prompts stay stable unless drift remains after managed repair."
+      },
+      "ticket_graph_and_follow_up": {
+        "status": "ticket_follow_up",
+        "surfaces": [],
+        "reason": "Ticket follow-up is required when source findings still need explicit routing through ticket-pack-builder.",
+        "finding_codes": [
+          "EXEC-GODOT-006",
+          "EXEC-REMED-001"
+        ]
+      },
+      "restart_surfaces": {
+        "status": "replace",
+        "surfaces": [
+          ".opencode/state/context-snapshot.md",
+          ".opencode/state/latest-handoff.md",
+          "START-HERE.md managed block"
+        ],
+        "reason": "Restart surfaces are derived and must be regenerated whenever managed repair changes workflow state."
+      },
+      "canonical_project_decisions": {
+        "status": "stable",
+        "surfaces": [],
+        "reason": "Managed repair preserves accepted project-scope decisions. Intent-changing drift must route outside routine public repair."
+      }
+    },
+    "migration_stage": {
+      "stage": "legacy-contract-migration",
+      "state": "current",
+      "policy": "current",
+      "required": false,
+      "migration_history_count": 0,
+      "from_process_version": 7,
+      "workflow_process_version": 7,
+      "repair_follow_on_process_version": 7,
+      "target_process_version": 7,
+      "compatibility_shim_scope": "package-internal",
+      "compatibility_shim_temporary": true,
+      "reasons": [],
+      "summary": "Repo already uses the current process contract.",
+      "migration_id": null
+    },
+    "repair_id": "2026-04-12T03:45:01Z"
+  },
+  "stage_results": [
+    {
+      "stage": "deterministic-refresh",
+      "status": "completed",
+      "internal_only": true
+    },
+    {
+      "stage": "project-skill-bootstrap",
+      "status": "required_not_run",
+      "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content."
+    },
+    {
+      "stage": "ticket-pack-builder",
+      "status": "required_not_run",
+      "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system."
+    }
+  ],
+  "execution_record": {
+    "repo_root": "/home/pc/projects/womanvshorseVA",
+    "repair_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
+    "repair_id": "2026-04-12T03:45:01Z",
+    "repair_basis_path": "/home/pc/projects/womanvshorseVA/diagnosis/20260412-034402",
+    "required_follow_on_stages": [
+      "project-skill-bootstrap",
+      "ticket-pack-builder"
+    ],
+    "required_follow_on_stage_details": [
+      {
+        "stage": "project-skill-bootstrap",
+        "owner": "project-skill-bootstrap",
+        "category": "repo_local_skills",
+        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content."
+      },
+      {
+        "stage": "ticket-pack-builder",
+        "owner": "ticket-pack-builder",
+        "category": "ticket_follow_up",
+        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system."
+      }
+    ],
+    "executed_stages": [
+      {
+        "stage": "deterministic-refresh",
+        "status": "completed",
+        "internal_only": true
+      }
+    ],
+    "recorded_completed_stages": [],
+    "recorded_execution_completed_stages": [],
+    "auto_detected_recorded_stages": [],
+    "pruned_unknown_stages": [],
+    "invalidated_recorded_stages": [],
+    "asserted_completed_stages": [],
+    "legacy_asserted_completed_stages": [],
+    "stage_completion_mode": "legacy_manual_assertion",
+    "follow_on_tracking_mode": "persistent_recorded_state",
+    "follow_on_state_path": ".opencode/meta/repair-follow-on-state.json",
+    "follow_on_tracking_state": {
+      "tracking_mode": "persistent_recorded_state",
+      "assertion_input_mode": "legacy_manual_assertion",
+      "cycle_id": "2026-04-12T03:45:01Z",
+      "created_at": "2026-04-12T03:45:01Z",
+      "last_updated_at": "2026-04-12T03:45:05Z",
+      "process_version": 7,
+      "repair_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
+      "repair_basis_path": "/home/pc/projects/womanvshorseVA/diagnosis/20260412-034402",
+      "pruned_unknown_stages": [],
+      "required_stages": [
+        "project-skill-bootstrap",
+        "ticket-pack-builder"
+      ],
+      "stage_records": {
+        "project-skill-bootstrap": {
+          "stage": "project-skill-bootstrap",
+          "owner": "project-skill-bootstrap",
+          "category": "repo_local_skills",
+          "status": "required_not_run",
+          "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content.",
+          "currently_required": true,
+          "last_checked_at": "2026-04-12T03:45:05Z",
+          "last_updated_at": "2026-04-12T03:45:05Z"
+        },
+        "ticket-pack-builder": {
+          "stage": "ticket-pack-builder",
+          "owner": "ticket-pack-builder",
+          "category": "ticket_follow_up",
+          "status": "required_not_run",
+          "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system.",
+          "currently_required": true,
+          "last_checked_at": "2026-04-12T03:45:05Z",
+          "last_updated_at": "2026-04-12T03:45:05Z"
+        }
+      },
+      "history": []
+    },
+    "deferred_stages": [],
+    "skipped_stages": [
+      {
+        "stage": "project-skill-bootstrap",
+        "status": "required_not_run",
+        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content."
+      },
+      {
+        "stage": "ticket-pack-builder",
+        "status": "required_not_run",
+        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system."
+      }
+    ],
+    "blocking_reasons": [
+      "project-skill-bootstrap must still run: Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content.",
+      "ticket-pack-builder must still run: Repair left remediation or reverification follow-up that must be routed into the repo ticket system.",
+      "Post-repair verification failed repair-contract consistency checks: placeholder_local_skills_survived_refresh."
+    ],
+    "repair_follow_on_outcome": "managed_blocked",
+    "migration_stage": {
+      "stage": "legacy-contract-migration",
+      "state": "current",
+      "policy": "current",
+      "required": false,
+      "migration_history_count": 0,
+      "from_process_version": 7,
+      "workflow_process_version": 7,
+      "repair_follow_on_process_version": 7,
+      "target_process_version": 7,
+      "compatibility_shim_scope": "package-internal",
+      "compatibility_shim_temporary": true,
+      "reasons": [],
+      "summary": "Repo already uses the current process contract.",
+      "migration_id": null
+    },
+    "verification_status": {
+      "performed": true,
+      "finding_count": 4,
+      "error_count": 3,
+      "warning_count": 1,
+      "codes": [
+        "SKILL001",
+        "EXEC-GODOT-006",
+        "EXEC-REMED-001",
+        "EXEC-REMED-001"
+      ],
+      "blocking_codes": [],
+      "manual_prerequisite_codes": [
+        "SKILL001"
+      ],
+      "source_follow_up_codes": [
+        "EXEC-GODOT-006",
+        "EXEC-REMED-001",
+        "EXEC-REMED-001"
+      ],
+      "process_state_codes": [],
+      "advisory_codes": [],
+      "pending_process_verification": true,
+      "verification_basis": "current_state_only",
+      "basis_requires_causal_replay": false,
+      "repair_basis_path": "/home/pc/projects/womanvshorseVA/diagnosis/20260412-034402",
+      "current_state_clean": false,
+      "causal_regression_verified": true,
+      "source_regression_summary": {
+        "comparison_available": true,
+        "pre_existing_codes": [
+          "EXEC-GODOT-006",
+          "EXEC-REMED-001"
+        ],
+        "persistent_codes": [
+          "EXEC-GODOT-006",
+          "EXEC-REMED-001"
+        ],
+        "resolved_codes": [],
+        "introduced_codes": [],
+        "introduced_critical_codes": []
+      },
+      "contract_failures": [
+        "placeholder_local_skills_survived_refresh"
+      ],
+      "contract_passed": false,
+      "verification_passed": false,
+      "supporting_logs": [],
+      "disposition_shadow_mode": {
+        "bundle_available": true,
+        "bundle_version": 1,
+        "bundle_finding_count": 4,
+        "delta_count": 0,
+        "deltas": []
+      }
+    },
+    "disposition_shadow_mode": {
+      "bundle_available": true,
+      "bundle_version": 1,
+      "bundle_finding_count": 4,
+      "delta_count": 0,
+      "deltas": []
+    },
+    "handoff_allowed": false,
+    "diff_summary": {
+      "files_added": [],
+      "files_removed": [],
+      "files_modified": [
+        ".opencode/lib/workflow.ts",
+        ".opencode/skills/stack-standards/SKILL.md",
+        ".opencode/tools/smoke_test.ts",
+        "START-HERE.md",
+        "tickets/manifest.json"
+      ]
+    },
+    "backup_path": null,
+    "repair_escalation_path": ".opencode/state/repair-escalation.json",
+    "remediation_ticket_ids": [
+      "REMED-003",
+      "REMED-004",
+      "REMED-002",
+      "RELEASE-001"
+    ],
+    "workflow_selection_sync": {
+      "performed": false,
+      "selected_ticket_id": "REMED-002",
+      "stage": "planning",
+      "status": "todo",
+      "approved_plan": false,
+      "before": {
+        "manifest_active_ticket": "REMED-002",
+        "workflow_active_ticket": "REMED-002",
+        "workflow_stage": "planning",
+        "workflow_status": "todo",
+        "workflow_approved_plan": false
+      },
+      "after": {
+        "manifest_active_ticket": "REMED-002",
+        "workflow_active_ticket": "REMED-002",
+        "workflow_stage": "planning",
+        "workflow_status": "todo",
+        "workflow_approved_plan": false
+      }
+    },
+    "ticket_graph_repair_changes": [],
+    "stale_stage_reconciliation": {
+      "stale": false,
+      "manifest_stage": "planning",
+      "evidenced_stage": null
+    },
+    "android_surface_result": {
+      "performed": false,
+      "reason": "all managed Android surfaces already exist",
+      "regenerated": []
+    },
+    "stale_surface_map": {
+      "workflow_tools_and_prompts": {
+        "status": "replace",
+        "surfaces": [
+          ".opencode/commands",
+          ".opencode/lib",
+          ".opencode/plugins",
+          ".opencode/tools",
+          "docs/process/git-capability.md",
+          "docs/process/model-matrix.md",
+          "docs/process/tooling.md",
+          "docs/process/workflow.md",
+          "opencode.jsonc"
+        ],
+        "reason": "Managed workflow tools, prompts, and process docs were refreshed or still show workflow drift."
+      },
+      "repo_local_skills": {
+        "status": "regenerate",
+        "surfaces": [
+          ".opencode/skills/stack-standards/SKILL.md",
+          "scaffold-managed .opencode/skills"
+        ],
+        "reason": "Repo-local skills need regeneration when scaffold-managed skills were replaced or placeholder/model drift remains.",
+        "finding_codes": [
+          "SKILL001"
+        ]
+      },
+      "agent_team_and_prompts": {
+        "status": "stable",
+        "surfaces": [],
+        "reason": "Agent-team prompts stay stable unless drift remains after managed repair."
+      },
+      "ticket_graph_and_follow_up": {
+        "status": "ticket_follow_up",
+        "surfaces": [],
+        "reason": "Ticket follow-up is required when source findings still need explicit routing through ticket-pack-builder.",
+        "finding_codes": [
+          "EXEC-GODOT-006",
+          "EXEC-REMED-001"
+        ]
+      },
+      "restart_surfaces": {
+        "status": "replace",
+        "surfaces": [
+          ".opencode/state/context-snapshot.md",
+          ".opencode/state/latest-handoff.md",
+          "START-HERE.md managed block"
+        ],
+        "reason": "Restart surfaces are derived and must be regenerated whenever managed repair changes workflow state."
+      },
+      "canonical_project_decisions": {
+        "status": "stable",
+        "surfaces": [],
+        "reason": "Managed repair preserves accepted project-scope decisions. Intent-changing drift must route outside routine public repair."
+      }
+    }
+  },
+  "repair_follow_on_state": {
+    "outcome": "managed_blocked",
+    "required_stage_details": [
+      {
+        "stage": "project-skill-bootstrap",
+        "owner": "project-skill-bootstrap",
+        "category": "repo_local_skills",
+        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content."
+      },
+      {
+        "stage": "ticket-pack-builder",
+        "owner": "ticket-pack-builder",
+        "category": "ticket_follow_up",
+        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system."
+      }
+    ],
+    "required_stages": [
+      "project-skill-bootstrap",
+      "ticket-pack-builder"
+    ],
+    "completed_stages": [],
+    "asserted_completed_stages": [],
+    "legacy_asserted_completed_stages": [],
+    "stage_completion_mode": "legacy_manual_assertion",
+    "tracking_mode": "persistent_recorded_state",
+    "follow_on_state_path": ".opencode/meta/repair-follow-on-state.json",
+    "recorded_stage_state": {
+      "project-skill-bootstrap": {
+        "stage": "project-skill-bootstrap",
+        "owner": "project-skill-bootstrap",
+        "category": "repo_local_skills",
+        "status": "required_not_run",
+        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content.",
+        "currently_required": true,
+        "last_checked_at": "2026-04-12T03:45:05Z",
+        "last_updated_at": "2026-04-12T03:45:05Z"
+      },
+      "ticket-pack-builder": {
+        "stage": "ticket-pack-builder",
+        "owner": "ticket-pack-builder",
+        "category": "ticket_follow_up",
+        "status": "required_not_run",
+        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system.",
+        "currently_required": true,
+        "last_checked_at": "2026-04-12T03:45:05Z",
+        "last_updated_at": "2026-04-12T03:45:05Z"
+      }
+    },
+    "pruned_unknown_stages": [],
+    "invalidated_recorded_stages": [],
+    "blocking_reasons": [
+      "project-skill-bootstrap must still run: Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content.",
+      "ticket-pack-builder must still run: Repair left remediation or reverification follow-up that must be routed into the repo ticket system.",
+      "Post-repair verification failed repair-contract consistency checks: placeholder_local_skills_survived_refresh."
+    ],
+    "verification_passed": false,
+    "handoff_allowed": false,
+    "current_state_clean": false,
+    "causal_regression_verified": true,
+    "verification_blocking_codes": [],
+    "manual_prerequisite_codes": [
+      "SKILL001"
+    ],
+    "source_follow_up_codes": [
+      "EXEC-GODOT-006",
+      "EXEC-REMED-001",
+      "EXEC-REMED-001"
+    ],
+    "process_state_codes": [],
+    "advisory_codes": [],
+    "contract_failures": [
+      "placeholder_local_skills_survived_refresh"
+    ],
+    "last_updated_at": "2026-04-12T03:45:05Z",
+    "process_version": 7,
+    "allowed_follow_on_tickets": []
+  },
+  "diagnosis_pack": {
+    "path": "/home/pc/projects/womanvshorseVA/diagnosis/20260412-034506",
+    "report_count": 4,
+    "manifest": {
+      "generated_at": "2026-04-12T03:45:06Z",
+      "repo_root": "/home/pc/projects/womanvshorseVA",
+      "finding_count": 4,
+      "finding_codes": [
+        "EXEC-GODOT-006",
+        "EXEC-REMED-001",
+        "SKILL001"
+      ],
+      "source_findings": [
+        {
+          "code": "EXEC-GODOT-006",
+          "severity": "error"
+        },
+        {
+          "code": "EXEC-REMED-001",
+          "severity": "error"
+        },
+        {
+          "code": "EXEC-REMED-001",
+          "severity": "error"
+        }
+      ],
+      "result_state": "validated failures found",
+      "diagnosis_kind": "post_repair_verification",
+      "evidence_mode": "current_state_only",
+      "audit_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
+      "report_files": {
+        "report_1": "01-initial-codebase-review.md",
+        "report_2": "02-scafforge-process-failures.md",
+        "report_3": "03-scafforge-prevention-actions.md",
+        "report_4": "04-live-repo-repair-plan.md"
+      },
+      "disposition_bundle_file": "disposition-bundle.json",
+      "disposition_bundle": {
+        "version": 1,
+        "generated_at": "2026-04-12T03:45:06Z",
+        "repo_root": "/home/pc/projects/womanvshorseVA",
+        "audit_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
+        "allowed_classes": [
+          "managed_blocker",
+          "manual_prerequisite_blocker",
+          "source_follow_up",
+          "process_state_only",
+          "advisory"
+        ],
+        "finding_count": 4,
+        "findings": [
+          {
+            "code": "SKILL001",
+            "severity": "warning",
+            "disposition_class": "manual_prerequisite_blocker",
+            "legacy_disposition_class": "managed_blocker",
+            "route": "scafforge-repair",
+            "repair_class": "safe Scafforge package change",
+            "evidence_grade": "repo-state validation",
+            "source_files": [
+              ".opencode/skills/stack-standards/SKILL.md"
+            ],
+            "provenance": "script"
+          },
+          {
+            "code": "EXEC-GODOT-006",
+            "severity": "error",
+            "disposition_class": "source_follow_up",
+            "legacy_disposition_class": "source_follow_up",
+            "route": "ticket-pack-builder",
+            "repair_class": "generated-repo remediation ticket",
+            "evidence_grade": "repo-state validation",
+            "source_files": [
+              "project.godot",
+              ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+            ],
+            "provenance": "script"
+          },
+          {
+            "code": "EXEC-REMED-001",
+            "severity": "error",
+            "disposition_class": "source_follow_up",
+            "legacy_disposition_class": "source_follow_up",
+            "route": "ticket-pack-builder",
+            "repair_class": "generated-repo remediation ticket",
+            "evidence_grade": "repo-state validation",
+            "source_files": [
+              "tickets/manifest.json",
+              ".opencode/state/reviews/release-001-review-review.md"
+            ],
+            "provenance": "script"
+          },
+          {
+            "code": "EXEC-REMED-001",
+            "severity": "error",
+            "disposition_class": "source_follow_up",
+            "legacy_disposition_class": "source_follow_up",
+            "route": "ticket-pack-builder",
+            "repair_class": "generated-repo remediation ticket",
+            "evidence_grade": "repo-state validation",
+            "source_files": [
+              "tickets/manifest.json",
+              ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+            ],
+            "provenance": "script"
+          }
+        ],
+        "counts": {
+          "managed_blocker": 0,
+          "manual_prerequisite_blocker": 1,
+          "source_follow_up": 3,
+          "process_state_only": 0,
+          "advisory": 0
+        },
+        "shadow_mode_deltas": [
+          {
+            "code": "SKILL001",
+            "legacy_disposition_class": "managed_blocker",
+            "disposition_class": "manual_prerequisite_blocker",
+            "route": "scafforge-repair",
+            "reason": "Legacy prefix classification would label SKILL001 as managed_blocker, but the authoritative bundle assigns manual_prerequisite_blocker."
+          }
+        ]
+      },
+      "ticket_recommendations": [
+        {
+          "id": "REMED-005",
+          "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+          "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+          "affected_files": [
+            "project.godot",
+            ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+          ],
+          "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+          "assignee": "implementer",
+          "source_finding_code": "EXEC-GODOT-006",
+          "source_finding_codes": [
+            "EXEC-GODOT-006"
+          ],
+          "severity": "error",
+          "route": "ticket-pack-builder",
+          "repair_class": "generated-repo remediation ticket",
+          "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+          "source_files": [
+            "project.godot",
+            ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+          ]
+        },
+        {
+          "id": "REMED-004",
+          "title": "Remediation review artifact does not contain runnable command evidence",
+          "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+          "affected_files": [
+            "tickets/manifest.json",
+            ".opencode/state/reviews/release-001-review-review.md"
+          ],
+          "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+          "assignee": "implementer",
+          "source_finding_code": "EXEC-REMED-001",
+          "source_finding_codes": [
+            "EXEC-REMED-001"
+          ],
+          "severity": "error",
+          "route": "ticket-pack-builder",
+          "repair_class": "generated-repo remediation ticket",
+          "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+          "source_files": [
+            "tickets/manifest.json",
+            ".opencode/state/reviews/release-001-review-review.md"
+          ]
+        },
+        {
+          "id": "REMED-002",
+          "title": "Remediation review artifact does not contain runnable command evidence",
+          "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+          "affected_files": [
+            "tickets/manifest.json",
+            ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+          ],
+          "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+          "assignee": "implementer",
+          "source_finding_code": "EXEC-REMED-001",
+          "source_finding_codes": [
+            "EXEC-REMED-001"
+          ],
+          "severity": "error",
+          "route": "ticket-pack-builder",
+          "repair_class": "generated-repo remediation ticket",
+          "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+          "source_files": [
+            "tickets/manifest.json",
+            ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+          ]
+        },
+        {
+          "id": "REMED-006",
+          "title": "One or more repo-local skills still contain generic placeholder text or stale synthesized guidance instead of current project-specific procedure",
+          "description": "Remediate SKILL001 by correcting the validated issue and rerunning the relevant quality checks.",
+          "affected_files": [
+            ".opencode/skills/stack-standards/SKILL.md"
+          ],
+          "suggested_fix_approach": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+          "assignee": "implementer",
+          "source_finding_code": "SKILL001",
+          "source_finding_codes": [
+            "SKILL001"
+          ],
+          "severity": "warning",
+          "route": "scafforge-repair",
+          "repair_class": "safe Scafforge package change",
+          "summary": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+          "source_files": [
+            ".opencode/skills/stack-standards/SKILL.md"
+          ]
+        }
+      ],
+      "package_work_required_first": false,
+      "recommended_next_step": "subject_repo_repair",
+      "verification_kind": "post_repair",
+      "repair_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
+      "repair_basis_path": "/home/pc/projects/womanvshorseVA/diagnosis/20260412-034402",
+      "current_state_clean": false,
+      "causal_regression_verified": true,
+      "verification_basis": "current_state_only",
+      "recommended_ticket_payload": "recommended-ticket-payload.json"
+    }
+  },
+  "remediation_follow_up": {
+    "created_tickets": [
+      "REMED-003",
+      "REMED-004",
+      "REMED-002",
+      "RELEASE-001"
+    ],
+    "superseded_tickets": [],
+    "diagnosis_manifest": "diagnosis/20260412-034506/manifest.json"
+  }
+}

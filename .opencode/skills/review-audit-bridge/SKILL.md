@@ -38,6 +38,7 @@ Rules:
 - if the approved plan, implementation artifact, or required validation context is missing, return a blocker instead of inferring correctness
 - use `ticket-execution` for lifecycle order and `project-context` for canonical repo docs
 - run the repo's build command, lint or type-check command, and reference-integrity checks when those quality gates exist for the active stack; include the raw command output in the review or QA artifact
+- for this Godot project, run `godot4 --headless --check-only` for build check, `godot4 --headless --export-debug "Android Debug" --output /tmp/test.apk` for export verification
 - if any required build, lint, type-check, or reference-integrity command fails, the verdict must be FAIL and the artifact must name the failing command plus the concrete error
 - when reviewing or validating a remediation ticket with `finding_source`, rerun the original finding-producing command first, confirm the specific failure is gone, then check that adjacent quality gates still pass
 - write any workflow-failure explanation or review retrospective to the repo-local process-log path described in `references/review-contract.md`

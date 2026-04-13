@@ -1,7 +1,7 @@
 ---
 description: Reconcile completed parallel lanes into one foreground workflow state
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Inspect completed lane artifacts, reviews, QA status, and lease state, then fold safe parallel outputs back into one foreground synthesis path.

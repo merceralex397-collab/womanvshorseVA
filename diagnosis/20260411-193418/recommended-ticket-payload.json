@@ -1,0 +1,46 @@
+[
+  {
+    "id": "REMED-001",
+    "title": "Remediation review artifact does not contain runnable command evidence",
+    "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      "tickets/manifest.json",
+      ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+    ],
+    "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+    "assignee": "implementer",
+    "source_finding_code": "EXEC-REMED-001",
+    "source_finding_codes": [
+      "EXEC-REMED-001"
+    ],
+    "severity": "error",
+    "route": "ticket-pack-builder",
+    "repair_class": "generated-repo remediation ticket",
+    "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+    "source_files": [
+      "tickets/manifest.json",
+      ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+    ]
+  },
+  {
+    "id": "REMED-002",
+    "title": "The ticket graph contains stale or contradictory source/follow-up linkage",
+    "description": "Remediate WFLOW019 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      "tickets/manifest.json"
+    ],
+    "suggested_fix_approach": "Use `ticket_reconcile` to atomically repair stale source/follow-up linkage, remove contradictory parent dependencies, and supersede invalidated follow-up tickets from current evidence.",
+    "assignee": "implementer",
+    "source_finding_code": "WFLOW019",
+    "source_finding_codes": [
+      "WFLOW019"
+    ],
+    "severity": "error",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Use `ticket_reconcile` to atomically repair stale source/follow-up linkage, remove contradictory parent dependencies, and supersede invalidated follow-up tickets from current evidence.",
+    "source_files": [
+      "tickets/manifest.json"
+    ]
+  }
+]

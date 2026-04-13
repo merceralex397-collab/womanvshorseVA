@@ -1,7 +1,7 @@
 ---
 description: Start the autonomous planning cycle for the current repo state
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Read the canonical project docs in order, resolve the active ticket from `tickets/manifest.json`, verify bootstrap readiness, and begin the internal lifecycle.

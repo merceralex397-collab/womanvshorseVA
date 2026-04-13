@@ -1,0 +1,17 @@
+# Smoke Test
+
+## Ticket
+
+- POLISH-001
+
+## Overall Result
+
+Overall Result: FAIL
+
+## Notes
+
+No deterministic smoke-test command was detected. Add a project smoke-test command or standard build or test scripts, then rerun the smoke-test stage.
+
+## Commands
+
+No deterministic smoke-test commands were detected.

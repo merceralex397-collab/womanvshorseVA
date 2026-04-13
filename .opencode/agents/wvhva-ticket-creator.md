@@ -1,6 +1,6 @@
 ---
 description: Hidden guarded ticket router for evidence-backed follow-up creation and lineage reconciliation
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 mode: subagent
 hidden: true
 temperature: 1.0

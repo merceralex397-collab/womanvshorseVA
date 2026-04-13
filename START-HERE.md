@@ -3,11 +3,11 @@
 <!-- SCAFFORGE:START_HERE_BLOCK START -->
 ## What This Repo Is
 
-Woman vs Horse VA — a 2D top-down arena action game for Android where a warrior woman fights waves of enemy horses. Built with Godot 4.6, using procedural/programmatic sprites (colored shapes). Touch controls. Single scene architecture.
+Woman vs Horse VA
 
 ## Current State
 
-Scaffold complete. Skills, agents, and ticket pack are populated with game-specific content. The repo is ready to begin implementation through the managed OpenCode workflow. Bootstrap has not yet been verified — the first ticket should run `environment_bootstrap` to confirm Godot 4.6 and Android SDK availability.
+The repo is operating under the managed OpenCode workflow. Use the canonical state files below instead of memory or raw ticket prose.
 
 ## Read In This Order
 
@@ -21,10 +21,10 @@ Scaffold complete. Skills, agents, and ticket pack are populated with game-speci
 
 ## Current Or Next Ticket
 
-- ID: SETUP-001
-- Title: Create main scene with arena
-- Wave: 0
-- Lane: scene-foundation
+- ID: REMED-002
+- Title: Remediation review artifact does not contain runnable command evidence
+- Wave: 6
+- Lane: remediation
 - Stage: planning
 - Status: todo
 - Resolution: open
@@ -33,40 +33,57 @@ Scaffold complete. Skills, agents, and ticket pack are populated with game-speci
 ## Dependency Status
 
 - current_ticket_done: no
-- dependent_tickets_waiting_on_current: SETUP-002, CORE-002, CORE-004, UI-001, UI-002
-- split_child_tickets: none
+- dependent_tickets_waiting_on_current: none
+- split_child_tickets: REMED-004, REMED-005
 
 ## Generation Status
 
-- handoff_status: scaffold complete — skills, agents, and tickets populated
+- handoff_status: workflow verification pending
 - process_version: 7
 - parallel_mode: sequential
-- pending_process_verification: false
-- repair_follow_on_outcome: clean
+- pending_process_verification: true
+- repair_follow_on_outcome: source_follow_up
 - repair_follow_on_required: false
 - repair_follow_on_next_stage: none
-- repair_follow_on_verification_passed: true
-- repair_follow_on_updated_at: Not yet recorded.
-- bootstrap_status: missing
-- bootstrap_proof: None
-- process_changed_at: Not yet recorded.
+- repair_follow_on_verification_passed: false
+- repair_follow_on_updated_at: 2026-04-12T03:46:07Z
+- pivot_in_progress: false
+- pivot_class: none
+- pivot_changed_surfaces: none
+- pivot_pending_stages: none
+- pivot_completed_stages: none
+- pivot_pending_ticket_lineage_actions: none
+- pivot_completed_ticket_lineage_actions: none
+- post_pivot_verification_passed: false
+- bootstrap_status: ready
+- bootstrap_proof: .opencode/state/artifacts/history/ui-001/bootstrap/2026-04-10T04-55-58-711Z-environment-bootstrap.md
+- bootstrap_blockers: none
 
 ## Post-Generation Audit Status
 
-- audit_or_repair_follow_up: none recorded
+- audit_or_repair_follow_up: follow-up required
 - reopened_tickets: none
-- done_but_not_fully_trusted: none
+- done_but_not_fully_trusted: RELEASE-001
 - pending_reverification: none
 - repair_follow_on_blockers: none
+- pivot_pending_stages: none
+- pivot_pending_ticket_lineage_actions: none
+
+## Code Quality Status
+
+- last_build_result: pass @ 2026-04-10T11:36:40.894Z
+- last_test_run_result: pass @ 2026-04-10T11:36:40.894Z
+- open_remediation_tickets: 3
+- known_reference_integrity_issues: 0
 
 ## Known Risks
 
-- Bootstrap not yet verified — godot4 and Android SDK availability must be confirmed before implementation work.
-- Validation can fail for environment reasons until bootstrap proof exists.
-- Historical completion should not be treated as current trust once defects or process drift are discovered.
-- Delegation mistakes can cause lifecycle loops; check `docs/AGENT-DELEGATION.md` before improvising a new handoff path.
+- Managed repair converged, but source-layer follow-up still remains in the ticket graph.
+- Historical completion should not be treated as fully trusted until pending process verification or explicit reverification is cleared.
+- Some done tickets are not fully trusted yet: RELEASE-001.
+- REMED-002 is an open split parent; child tickets REMED-004, REMED-005 remain the active foreground work.
 
 ## Next Action
 
-Run `environment_bootstrap` to verify Godot 4.6 and Android SDK availability. Then claim SETUP-001 and begin planning the main scene and arena.
+Keep REMED-002 open as a split parent and continue the child ticket lanes: REMED-004, REMED-005.
 <!-- SCAFFORGE:START_HERE_BLOCK END -->

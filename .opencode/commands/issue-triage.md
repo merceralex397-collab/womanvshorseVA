@@ -1,7 +1,7 @@
 ---
 description: Triage a defect discovered after prior ticket completion
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Collect the source ticket, evidence artifact, and defect classification, then route the issue through the canonical post-completion defect flow.

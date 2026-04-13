@@ -1,83 +1,48 @@
 ---
 name: stack-standards
-description: Godot 4.6 Android game standards — GDScript conventions, validation commands, export configuration, and quality gates for this repo.
+description: Hold the project-local standards for languages, frameworks, validation, and runtime assumptions. Use when planning or implementing work that should follow repo-specific engineering conventions.
 ---
 
-# Stack Standards — Godot 4.6 Android
+# Stack Standards
 
 Before applying these rules, call `skill_ping` with `skill_id: "stack-standards"` and `scope: "project"`.
 
-Current stack: `Godot 4.6 — GDScript — Android export`
+Current scaffold mode: `framework-agnostic`
 
-## Language and Framework
+## Universal Engineering Standards
 
-- **Engine**: Godot 4.6 (GDScript only, no C# or GDExtension)
-- **Target**: Android APK (landscape, touch controls)
-- **Art pipeline**: Procedural (see `procedural-art` skill). No imported image/audio assets.
-- **Scene architecture**: Single main scene with state machine (Title → Playing → GameOver)
+These rules apply to all work in this repository regardless of stack.
 
-## GDScript Quality Rules
+### Code Quality
+- Write code for readability first; optimise only when profiled evidence justifies it.
+- Keep functions and methods focused on a single responsibility; extract helpers when a unit exceeds a single screen of logic.
+- Every public or exported symbol must have a documentation comment that describes intent, not implementation.
+- Delete dead code instead of commenting it out; use version control to recover removed code.
 
-- Use static typing on all function signatures and member variables
-- Use `@export`, `@onready`, `class_name` (Godot 4.x syntax, not Godot 3.x)
-- Prefix private members with `_`
-- Use `snake_case` for files, functions, variables; `PascalCase` for classes; `UPPER_SNAKE_CASE` for constants
-- Document every public function and exported variable with `##` doc comments
-- Keep scripts under 300 lines; extract helpers into separate scripts when they grow
+### Quality Gate Commands
 
-## Quality Gate Commands
+Use the smallest stack-appropriate command set that proves the code still builds, references resolve, and the test surface is callable.
 
-These are the canonical validation commands for this project:
+For this Godot 4.6 project:
+- Build check: `godot4 --headless --check-only`
+- Scene reference checks: `godot4 --headless --doctool .` (generates reference docs, verifies scene links)
+- Autoload validation: verify autoload scripts load without errors via `godot4 --headless --script res://autoload_check.gd` (custom script)
+- Project load/import verification: `godot4 --headless --export-debug "Android Debug" --output /tmp/test.apk` (export attempt to verify project integrity)
+- No separate lint or type-check; GDScript is dynamically typed, errors caught at runtime/load
+- No test framework configured; smoke tests cover runtime behavior
 
-```bash
-# 1. Project load check (verifies project.godot parses and imports resolve)
-godot4 --headless --quit
+### Validation
+- All external inputs (API payloads, file reads, environment variables) must be validated at the boundary before use.
+- Assertions and precondition checks belong at the call site, not buried in utility helpers.
+- Write tests for correctness-critical paths; treat flaky tests as bugs to fix before merge.
 
-# 2. GDScript syntax check (run on each .gd file)
-godot4 --headless --check-only --script res://scripts/main.gd
+### Dependencies
+- Add a dependency only when it solves a problem the project cannot reasonably solve itself.
+- Pin dependency versions in lock files; never rely on floating ranges in production builds.
+- Audit new dependencies for license compatibility before adding them.
 
-# 3. Scene load check (verifies .tscn references resolve)
-godot4 --headless --quit --path .
+### Process
+- Use ticket tools to track work; do not silently advance stages without updating ticket state.
+- Artifacts produced by each stage must be registered via `artifact_write` / `artifact_register`.
+- Smoke tests run on the real binary or export target, not on a mocked surrogate.
 
-# 4. Debug APK build (full export validation)
-godot4 --headless --export-debug "Android Debug" build/android/womanvshorseva-debug.apk
-```
-
-When `godot4` is not available in the environment, fall back to:
-```bash
-# Syntax-level validation using GDScript parser
-grep -rn "extends\|class_name\|func " scripts/ --include="*.gd"
-# File reference integrity check
-grep -rn 'load("\|preload("' scripts/ --include="*.gd" | while read line; do
-  path=$(echo "$line" | grep -oP 'res://[^"]+')
-  [ -n "$path" ] && [ ! -f "${path#res://}" ] && echo "MISSING: $path in $line"
-done
-```
-
-## Key Configuration Files
-
-| File | Purpose | Pitfalls |
-|------|---------|----------|
-| `project.godot` | Engine config, window size, stretch mode | Must set landscape orientation and canvas_items stretch |
-| `export_presets.cfg` | Android export preset | Must reference valid keystore or use debug signing |
-| `scenes/main.tscn` | Root scene | Must be set as main scene in project.godot |
-
-## Android Export Pitfalls
-
-- The `export_presets.cfg` preset name must match the export command exactly (e.g., `"Android Debug"`)
-- Debug signing works without a keystore; release signing requires one
-- `build/android/` directory must exist before export (create with `mkdir -p`)
-- Android export templates must be installed on the build machine
-
-## Dependency Policy
-
-- **Zero external dependencies.** This project uses only the Godot engine.
-- No GDScript addons, no asset packs, no third-party plugins
-- All visuals are procedurally generated (see `procedural-art` skill)
-
-## Process Rules
-
-- Use ticket tools to track work; do not silently advance stages without updating ticket state
-- Artifacts produced by each stage must be registered via `artifact_write` / `artifact_register`
-- Smoke tests run against the actual APK export or `godot4 --headless` project load, not mocked surrogates
-- Include raw command output in all implementation and QA artifacts

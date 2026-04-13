@@ -1,7 +1,7 @@
 ---
 description: Select the next safe execution wave and parallel lane candidates
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Read the active backlog, dependency graph, bootstrap readiness, and trust state, then choose the next foreground ticket and any safe parallel lane candidates.

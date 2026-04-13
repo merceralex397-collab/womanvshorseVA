@@ -11,9 +11,9 @@ Selected runtime profile:
 
 - model tier: `standard`
 - provider: `minimax-coding-plan`
-- team lead / planner / reviewers: `minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7`
-- implementer: `minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7`
-- utilities, docs, and QA helpers: `minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7`
+- team lead / planner / reviewers: `minimax-coding-plan/MiniMax-M2.7`
+- implementer: `minimax-coding-plan/MiniMax-M2.7`
+- utilities, docs, and QA helpers: `minimax-coding-plan/MiniMax-M2.7`
 - operating profile: `Standard-tier evidence-first profile`
 - prompt density: `explicit checklists with selective examples and linked truth sources`
 
@@ -45,13 +45,3 @@ Expected output
 Evidence required
 Blockers
 ```
-
-## MiniMax-M2.7 — Repo-Proven Guidance
-
-These notes are based on observed behavior in this project context:
-
-- **GDScript generation**: The model handles GDScript 4.x syntax well but occasionally uses Godot 3.x patterns (e.g., `yield` instead of `await`, `onready` instead of `@onready`). Delegation briefs should specify "Godot 4.6 GDScript" explicitly and reference the `godot-android-game` skill.
-- **Procedural art**: When generating `_draw()` code or Polygon2D setup, provide the exact color values and sizes from the `procedural-art` skill to avoid the model inventing its own visual language.
-- **Scene tree references**: Specify node paths explicitly in delegation briefs. The model tends to assume `$NodeName` paths that may not match the actual scene tree.
-- **Prompt density**: Keep delegation briefs under 2000 tokens. Include the exact file paths to create/modify and the acceptance criteria from the ticket. Omit background context the model can load from skills.
-- **Evidence requirements**: Always request command output in implementation artifacts. The model will claim success without evidence if not explicitly required to include it.

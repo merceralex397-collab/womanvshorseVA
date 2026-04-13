@@ -60,6 +60,20 @@ export default tool({
           : changedAt,
     } as typeof workflow.repair_follow_on
 
+    // Auto-resolve managed_blocked only when the cycle is fully clean.
+    const rfo = workflow.repair_follow_on
+    const requiredStages = Array.isArray(rfo.required_stages) ? rfo.required_stages : []
+    const completedStages = Array.isArray(rfo.completed_stages) ? rfo.completed_stages : []
+    if (
+      rfo.outcome === "managed_blocked" &&
+      requiredStages.every((stage: string) => completedStages.includes(stage)) &&
+      rfo.blocking_reasons.length === 0 &&
+      rfo.verification_passed === true &&
+      rfo.handoff_allowed === true
+    ) {
+      rfo.outcome = "clean"
+    }
+
     const expectedRevision = workflow.state_revision
     await saveWorkflowState(workflow, rootPath(), expectedRevision, { refreshDerivedSurfaces: false }, { manifest, skipGraphValidation: true })
 

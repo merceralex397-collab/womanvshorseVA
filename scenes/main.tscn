@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://b8xvnm4w3qx6e"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="2_hud"]
+[ext_resource type="Script" path="res://scripts/wave_spawner.gd" id="3_wavespawner"]
+[ext_resource type="Script" path="res://scripts/title_screen.gd" id="4_titlescreen"]
+[ext_resource type="Script" path="res://scripts/game_over_screen.gd" id="5_gameoverscreen"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("2_hud")
+
+[node name="TitleScreen" type="CanvasLayer" parent="."]
+script = ExtResource("4_titlescreen")
+
+[node name="GameOverScreen" type="CanvasLayer" parent="."]
+script = ExtResource("5_gameoverscreen")
+
+[node name="Arena" type="Node2D" parent="."]
+
+[node name="WaveSpawner" type="Node" parent="."]
+script = ExtResource("3_wavespawner")

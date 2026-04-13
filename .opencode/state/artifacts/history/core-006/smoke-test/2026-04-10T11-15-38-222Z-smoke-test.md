@@ -1,0 +1,56 @@
+# Smoke Test
+
+## Ticket
+
+- CORE-006
+
+## Overall Result
+
+Overall Result: PASS
+
+## Notes
+
+All detected deterministic smoke-test commands passed.
+
+## Commands
+
+### 1. command override 1
+
+- reason: Explicit smoke-test command override supplied by the caller.
+- command: `godot4 --headless --path . --quit`
+- exit_code: 0
+- duration_ms: 295
+- missing_executable: none
+- failure_classification: none
+- blocked_by_permissions: false
+
+#### stdout
+
+~~~~text
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+~~~~
+
+#### stderr
+
+~~~~text
+SCRIPT ERROR: Parse Error: Function "draw_circle()" not found in base self.
+          at: GDScript::reload (res://scripts/hud.gd:47)
+SCRIPT ERROR: Parse Error: Function "queue_redraw()" not found in base self.
+          at: GDScript::reload (res://scripts/hud.gd:51)
+ERROR: Failed to load script "res://scripts/hud.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2907)
+SCRIPT ERROR: Parse Error: Identifier "EnemyBrown" not declared in the current scope.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:78)
+SCRIPT ERROR: Parse Error: Identifier "EnemyBlack" not declared in the current scope.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:79)
+SCRIPT ERROR: Parse Error: Identifier "EnemyWar" not declared in the current scope.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:80)
+SCRIPT ERROR: Parse Error: Identifier "EnemyBoss" not declared in the current scope.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:81)
+SCRIPT ERROR: Parse Error: Identifier "EnemyBrown" not declared in the current scope.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:82)
+SCRIPT ERROR: Parse Error: Function "get_viewport_rect()" not found in base self.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:85)
+ERROR: Failed to load script "res://scripts/wave_spawner.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2907)
+~~~~

@@ -1,0 +1,174 @@
+{
+  "generated_at": "2026-04-12T03:46:55Z",
+  "repo_root": "/home/pc/projects/womanvshorseVA",
+  "finding_count": 3,
+  "finding_codes": [
+    "EXEC-GODOT-006",
+    "EXEC-REMED-001"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "initial_diagnosis",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:d871daaf79a4",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-12T03:46:55Z",
+    "repo_root": "/home/pc/projects/womanvshorseVA",
+    "audit_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:d871daaf79a4",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 3,
+    "findings": [
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/release-001-review-review.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 0,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 3,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-006",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ]
+    },
+    {
+      "id": "REMED-004",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/release-001-review-review.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/release-001-review-review.md"
+      ]
+    },
+    {
+      "id": "REMED-002",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_source_follow_up",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

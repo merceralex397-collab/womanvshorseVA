@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-10T05:58:14Z",
+  "repo_root": "/home/pc/projects/womanvshorseVA",
+  "audit_package_commit": "d82df7b2b0550e2378b02b10809153089e0eadd9+dirty:fe1a9ab49109",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 2,
+  "findings": [
+    {
+      "code": "SKILL001",
+      "severity": "warning",
+      "disposition_class": "manual_prerequisite_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        ".opencode/skills/stack-standards/SKILL.md"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/artifacts/history/remed-001/review/2026-04-09T23-20-14-546Z-backlog-verification.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 0,
+    "manual_prerequisite_blocker": 1,
+    "source_follow_up": 1,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": [
+    {
+      "code": "SKILL001",
+      "legacy_disposition_class": "managed_blocker",
+      "disposition_class": "manual_prerequisite_blocker",
+      "route": "scafforge-repair",
+      "reason": "Legacy prefix classification would label SKILL001 as managed_blocker, but the authoritative bundle assigns manual_prerequisite_blocker."
+    }
+  ]
+}

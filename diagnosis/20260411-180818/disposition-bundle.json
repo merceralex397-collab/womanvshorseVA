@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-11T18:08:18Z",
+  "repo_root": "/home/pc/projects/womanvshorseVA",
+  "audit_package_commit": "d82df7b2b0550e2378b02b10809153089e0eadd9+dirty:94a85d4b923b",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 2,
+  "findings": [
+    {
+      "code": "WFLOW019",
+      "severity": "error",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "tickets/manifest.json"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 1,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 1,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": []
+}

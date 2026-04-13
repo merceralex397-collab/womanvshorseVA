@@ -1,0 +1,215 @@
+# Smoke Test
+
+## Ticket
+
+- RELEASE-001
+
+## Overall Result
+
+Overall Result: PASS
+
+## Notes
+
+All detected deterministic smoke-test commands passed.
+
+## Commands
+
+### 1. command override 1
+
+- reason: Explicit smoke-test command override supplied by the caller.
+- command: `godot4 --headless --export-debug Android Debug build/android/womanvshorseVA-debug.apk`
+- exit_code: 0
+- duration_ms: 13238
+- missing_executable: none
+- failure_classification: none
+- blocked_by_permissions: false
+
+#### stdout
+
+~~~~text
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (14 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | EnemyBase[39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | EnemyBlack[39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | EnemyBoss[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | EnemyBrown[39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | EnemyWar[39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | HitParticle[39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | WaveSpawner[39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1mexport[22m | Started Exporting for Android (105 steps)[39m[0m
+0 param: --xr_mode_regular
+1 param: --xr-mode
+2 param: off
+3 param: --fullscreen
+4 param: --background_color
+5 param: #000000
+[   0% ] [90m[1mexport[22m | Creating APK...[39m[0m
+ADDING: classes.dex
+ADDING: classes10.dex
+ADDING: classes11.dex
+ADDING: classes12.dex
+ADDING: classes13.dex
+ADDING: classes14.dex
+ADDING: classes2.dex
+ADDING: classes3.dex
+ADDING: classes4.dex
+ADDING: classes5.dex
+ADDING: classes6.dex
+ADDING: classes7.dex
+ADDING: classes8.dex
+ADDING: classes9.dex
+ADDING: lib/arm64-v8a/libc++_shared.so
+ADDING: lib/arm64-v8a/libgodot_android.so
+Adding application metadata org.godotengine.rendering.method
+Adding application metadata org.godotengine.editor.version
+Adding feature android.hardware.vulkan.level
+Adding feature android.hardware.vulkan.version
+ADDING: AndroidManifest.xml
+ADDING: res/anim-v21/fragment_fast_out_extra_slow_in.xml
+ADDING: res/animator/fragment_close_enter.xml
+ADDING: res/animator/fragment_close_exit.xml
+ADDING: res/animator/fragment_fade_enter.xml
+ADDING: res/animator/fragment_fade_exit.xml
+ADDING: res/animator/fragment_open_enter.xml
+ADDING: res/animator/fragment_open_exit.xml
+ADDING: res/drawable-hdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-hdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-hdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable-mdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-mdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-mdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable-v21/notification_action_background.xml
+ADDING: res/drawable-v23/compat_splash_screen.xml
+ADDING: res/drawable-v23/compat_splash_screen_no_icon_background.xml
+ADDING: res/drawable-xhdpi-v4/notification_bg_low_normal.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_normal.9.png
+ADDING: res/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png
+ADDING: res/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png
+ADDING: res/drawable/icon_background.xml
+ADDING: res/drawable/notification_bg.xml
+ADDING: res/drawable/notification_bg_low.xml
+ADDING: res/drawable/notification_icon_background.xml
+ADDING: res/drawable/notification_tile_bg.xml
+ADDING: res/layout-v21/notification_action.xml
+ADDING: res/layout-v21/notification_action_tombstone.xml
+ADDING: res/layout-v21/notification_template_custom_big.xml
+ADDING: res/layout-v21/notification_template_icon_group.xml
+ADDING: res/layout/custom_dialog.xml
+ADDING: res/layout/downloading_expansion.xml
+ADDING: res/layout/godot_app_layout.xml
+ADDING: res/layout/notification_template_part_chronometer.xml
+ADDING: res/layout/notification_template_part_time.xml
+ADDING: res/layout/remote_godot_fragment_layout.xml
+ADDING: res/layout/snackbar.xml
+ADDING: res/layout/splash_screen_view.xml
+ADDING: res/layout/status_bar_ongoing_event_progress_bar.xml
+ADDING: res/mipmap-anydpi-v26/icon.xml
+ADDING: res/mipmap-hdpi-v4/icon.webp
+ADDING: res/mipmap-hdpi-v4/icon_background.webp
+ADDING: res/mipmap-hdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-hdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-mdpi-v4/icon.webp
+ADDING: res/mipmap-mdpi-v4/icon_background.webp
+ADDING: res/mipmap-mdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-mdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xhdpi-v4/icon.webp
+ADDING: res/mipmap-xhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xxhdpi-v4/icon.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xxhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_background.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_foreground.webp
+ADDING: res/mipmap-xxxhdpi-v4/icon_monochrome.webp
+ADDING: res/mipmap/icon.webp
+ADDING: res/mipmap/icon_background.webp
+ADDING: res/mipmap/icon_foreground.webp
+ADDING: res/mipmap/icon_monochrome.webp
+ADDING: res/xml/godot_provider_paths.xml
+ADDING: resources.arsc
+ADDING: DebugProbesKt.bin
+ADDING: kotlin/annotation/annotation.kotlin_builtins
+ADDING: kotlin/collections/collections.kotlin_builtins
+ADDING: kotlin/concurrent/atomics/atomics.kotlin_builtins
+ADDING: kotlin/coroutines/coroutines.kotlin_builtins
+ADDING: kotlin/internal/internal.kotlin_builtins
+ADDING: kotlin/kotlin.kotlin_builtins
+ADDING: kotlin/ranges/ranges.kotlin_builtins
+ADDING: kotlin/reflect/reflect.kotlin_builtins
+[   0% ] [90m[1mexport[22m | Adding files...[39m[0m
+[  97% ] [90m[1mexport[22m | Aligning APK...[39m[0m
+[  98% ] [90m[1mexport[22m | Signing debug APK...[39m[0m
+Signing binary using: 
+/home/pc/Android/Sdk/build-tools/35.0.1/apksigner sign --verbose --ks <REDACTED> --ks-pass pass:<REDACTED> --ks-key-alias <REDACTED> /home/pc/projects/womanvshorseVA/build/android/womanvshorseVA-debug.apk
+Signed
+
+[  99% ] [90m[1mexport[22m | Verifying APK...[39m[0m
+[92m[ DONE ][39m [1mexport[22m
+[0m
+~~~~
+
+#### stderr
+
+~~~~text
+ERROR: No project icon specified. Please specify one in the Project Settings under Application -> Config -> Icon
+   at: load_icon_refs (platform/android/export/export_plugin.cpp:1897)
+SCRIPT ERROR: Parse Error: Function "draw_circle()" not found in base self.
+          at: GDScript::reload (res://scripts/hud.gd:47)
+SCRIPT ERROR: Parse Error: Function "queue_redraw()" not found in base self.
+          at: GDScript::reload (res://scripts/hud.gd:51)
+ERROR: Failed to load script "res://scripts/hud.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2907)
+SCRIPT ERROR: Parse Error: Function "get_viewport_rect()" not found in base self.
+          at: GDScript::reload (res://scripts/wave_spawner.gd:85)
+ERROR: Failed to load script "res://scripts/wave_spawner.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2907)
+~~~~
+
+### 2. command override 2
+
+- reason: Explicit smoke-test command override supplied by the caller.
+- command: `ls -la build/android/womanvshorseVA-debug.apk`
+- exit_code: 0
+- duration_ms: 3
+- missing_executable: none
+- failure_classification: none
+- blocked_by_permissions: false
+
+#### stdout
+
+~~~~text
+-rw-r--r-- 1 pc pc 27545858 Apr 10 12:36 build/android/womanvshorseVA-debug.apk
+~~~~
+
+#### stderr
+
+~~~~text
+<no output>
+~~~~

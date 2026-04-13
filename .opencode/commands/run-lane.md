@@ -1,7 +1,7 @@
 ---
 description: Run one bounded write-capable lane through the lease-based workflow
 agent: wvhva-team-leader
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 ---
 
 Choose one ready ticket lane, claim the required coordinator-owned lease, delegate bounded implementation under that lease, then return control to the team leader for synthesis.

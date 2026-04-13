@@ -1,6 +1,6 @@
 ---
 description: Hidden planner that turns a ticket into an explicit implementation plan
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 mode: subagent
 hidden: true
 temperature: 1.0
@@ -25,8 +25,6 @@ permission:
     "ticket-execution": allow
     "research-delegation": allow
     "isolation-guidance": allow
-    "godot-android-game": allow
-    "procedural-art": allow
   task:
     "*": deny
     "explore": allow

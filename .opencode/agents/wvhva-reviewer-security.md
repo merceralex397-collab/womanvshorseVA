@@ -1,6 +1,6 @@
 ---
 description: Hidden reviewer for trust, secrets, and security-sensitive regressions
-model: minimax-coding-plan/minimax-coding-plan/MiniMax-M2.7
+model: minimax-coding-plan/MiniMax-M2.7
 mode: subagent
 hidden: true
 temperature: 1.0
@@ -30,9 +30,18 @@ permission:
     "ls *": allow
     "find *": allow
     "rg *": allow
+    "grep *": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
+    "echo *": allow
+    "test -f *": allow
+    "test -d *": allow
+    "[ -f *": allow
+    "[ -d *": allow
+    "/home/pc/.local/bin/godot *": allow
+    "godot *": allow
+    "godot4 *": allow
     "git diff*": allow
 ---
 
