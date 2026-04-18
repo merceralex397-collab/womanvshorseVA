@@ -1,12 +1,13 @@
 import { tool } from "@opencode-ai/plugin"
 import { spawn } from "node:child_process"
-import { existsSync, readdirSync } from "node:fs"
+import { existsSync, readdirSync, realpathSync } from "node:fs"
 import { access, readFile, readdir } from "node:fs/promises"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { delimiter, dirname, join } from "node:path"
 import {
 	computeBootstrapFingerprint,
 	defaultBootstrapProofPath,
+	describeBootstrapFingerprintInputs,
 	findExistingRepoVenvExecutable,
 	getTicket,
 	loadArtifactRegistry,
@@ -164,6 +165,37 @@ async function discoverAndroidSdkPath(): Promise<string | null> {
 		join(home, "AppData", "Local", "Android", "Sdk"),
 	]) {
 		if (await exists(candidate)) return candidate
+	}
+	return null
+}
+
+async function discoverJavaHome(): Promise<string | null> {
+	const envValue = process.env.JAVA_HOME
+	if (envValue && await exists(envValue)) return envValue
+	const pathValue = process.env.PATH || ""
+	const executableNames = process.platform === "win32" ? ["java.exe", "java"] : ["java"]
+	for (const segment of pathValue.split(delimiter)) {
+		const trimmed = segment.trim()
+		if (!trimmed) continue
+		for (const executableName of executableNames) {
+			const candidate = join(trimmed, executableName)
+			if (!(await exists(candidate))) continue
+			try {
+				const resolved = realpathSync(candidate)
+				const javaHome = dirname(dirname(resolved))
+				if (await exists(join(javaHome, "bin"))) return javaHome
+			} catch {
+				continue
+			}
+		}
+	}
+	for (const fallback of [
+		join("/usr", "lib", "jvm", "default-java"),
+		join("/usr", "lib", "jvm", "java-21-openjdk-amd64"),
+		join("/usr", "lib", "jvm", "java-17-openjdk-amd64"),
+		join("/usr", "lib", "jvm", "java-11-openjdk-amd64"),
+	]) {
+		if (await exists(fallback)) return fallback
 	}
 	return null
 }
@@ -455,6 +487,7 @@ function isAdvisoryBootstrapFailure(command: CommandSpec, result: CommandResult)
 function renderArtifact(
 	ticketId: string,
 	fingerprint: string,
+	fingerprintInputs: Awaited<ReturnType<typeof describeBootstrapFingerprintInputs>>,
 	detections: StackDetectionResult[],
 	commands: CommandResult[],
 	blockers: BootstrapBlocker[],
@@ -481,8 +514,14 @@ function renderArtifact(
 		? blockers.map((item) => `- ${item.executable}: ${item.reason}${item.install_command ? ` | install_command: ${item.install_command}` : ""}`).join("\n")
 		: "- None"
 	const warningLines = warnings.length > 0 ? warnings.map((item) => `- ${item}`).join("\n") : "- None"
+	const fingerprintInputLines = [
+		`- input_files: ${fingerprintInputs.input_files.join(", ") || "none"}`,
+		...Object.entries(fingerprintInputs.repo_surfaces).map(([key, value]) => `- repo_surface.${key}: ${value ? "present" : "missing"}`),
+		...Object.entries(fingerprintInputs.env).map(([key, value]) => `- env.${key}: ${value}`),
+		...Object.entries(fingerprintInputs.host_paths).map(([key, value]) => `- host_path.${key}: ${value}`),
+	].join("\n")
 
-	return `# Environment Bootstrap\n\n## Ticket\n\n- ${ticketId}\n\n## Overall Result\n\nOverall Result: ${passed ? "PASS" : "FAIL"}\n\n## Environment Fingerprint\n\n- ${fingerprint}\n\n## Stack Detections\n\n${detectionSection}\n\n## Missing Prerequisites\n\n${prerequisites}\n\n## Blockers\n\n${blockerLines}\n\n## Warnings\n\n${warningLines}\n\n## Notes\n\n${note}\n\n## Commands\n\n${commandSections}\n`
+	return `# Environment Bootstrap\n\n## Ticket\n\n- ${ticketId}\n\n## Overall Result\n\nOverall Result: ${passed ? "PASS" : "FAIL"}\n\n## Environment Fingerprint\n\n- ${fingerprint}\n\n## Fingerprint Inputs\n\n${fingerprintInputLines}\n\n## Stack Detections\n\n${detectionSection}\n\n## Missing Prerequisites\n\n${prerequisites}\n\n## Blockers\n\n${blockerLines}\n\n## Warnings\n\n${warningLines}\n\n## Notes\n\n${note}\n\n## Commands\n\n${commandSections}\n`
 }
 
 async function detectPythonCommand(root: string): Promise<string | undefined> {
@@ -674,18 +713,21 @@ async function detectGodotBootstrap(root: string): Promise<StackDetectionResult>
 		} else {
 			detection.version_info.android_sdk_path = androidSdkPath
 		}
+		const javaHome = await discoverJavaHome()
 		if (!(await firstAvailableExecutable(["java"], ["-version"]))) {
 			detection.blockers.push(createBlocker("java", "Required for Android export support in Godot.", null))
-		} else if (!process.env.JAVA_HOME) {
-			// java is in PATH but JAVA_HOME is not set — Godot's Android Gradle build requires JAVA_HOME,
-			// not just a java binary in PATH. Without it the export fails with "A valid Java SDK path is
-			// required in Editor Settings." Derive a candidate path from the binary and surface it as a blocker.
+		} else if (!javaHome) {
 			detection.blockers.push(createBlocker(
 				"JAVA_HOME",
 				"JAVA_HOME is not set. Godot's Android Gradle build requires JAVA_HOME (not just java in PATH). " +
 				"Run: export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && echo $JAVA_HOME",
 				"export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))"
 			))
+		} else {
+			detection.version_info.java_home = javaHome
+			if (!process.env.JAVA_HOME) {
+				detection.warnings.push(`JAVA_HOME is not set explicitly; inferred ${javaHome} from the available Java runtime.`)
+			}
 		}
 		if (!(await firstAvailableExecutable(["javac"], ["-version"]))) detection.blockers.push(createBlocker("javac", "Required for Android export support in Godot.", null))
 		if (!(await hasGodotExportTemplatesInstalled())) detection.blockers.push(createBlocker("godot-export-templates", "Required for Godot Android debug APK export.", null))
@@ -695,7 +737,31 @@ async function detectGodotBootstrap(root: string): Promise<StackDetectionResult>
 		if (!hasMeaningfulAndroidSupportSurface(root)) {
 			detection.warnings.push(`Android target declared in canonical brief, but repo prerequisite ${androidExpectation.repo_prerequisites[1]} is still missing.`)
 		}
+
+		// Debug keystore detection for Android export
+		const keystoreCandidates = [
+			join(homedir(), ".android", "debug.keystore"),
+			join(homedir(), ".local", "share", "godot", "keystores", "debug.keystore"),
+		]
+		const foundKeystore = keystoreCandidates.find((k) => existsSync(k))
+		if (foundKeystore) {
+			detection.version_info.android_debug_keystore = foundKeystore
+		} else {
+			detection.blockers.push(createBlocker(
+				"android-debug-keystore",
+				"No Android debug keystore found. Required for Godot Android debug APK export. " +
+				"Generate one with: keytool -genkeypair -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android",
+				"keytool -genkeypair -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android",
+			))
+		}
 	}
+
+	// Blender detection for game projects with asset pipelines
+	const blenderExecutable = await firstAvailableExecutable(["blender"], ["--version"])
+	if (blenderExecutable) {
+		detection.version_info.blender_executable = blenderExecutable
+	}
+
 	return finalizeDetection(detection)
 }
 
@@ -707,7 +773,9 @@ async function detectJavaAndroidBootstrap(root: string): Promise<StackDetectionR
 	const sourceCompatibility = combinedBuildText.match(/sourceCompatibility\s*=\s*['"]?([^'"\n]+)/)?.[1]
 	if (sourceCompatibility) detection.version_info.source_compatibility = sourceCompatibility
 	const isAndroid = /com\.android\.(application|library)|android\s*\{/.test(combinedBuildText) || existsSync(join(root, "AndroidManifest.xml"))
+	const javaHome = await discoverJavaHome()
 	if (!(await firstAvailableExecutable(["java"], ["-version"]))) detection.blockers.push(createBlocker("java", `Required by ${indicatorFiles.join(", ")}.`, null))
+	else if (javaHome) detection.version_info.java_home = javaHome
 	if (!(await firstAvailableExecutable(["javac"], ["-version"]))) detection.blockers.push(createBlocker("javac", `Required by ${indicatorFiles.join(", ")}.`, null))
 	if (existsSync(join(root, "gradlew"))) detection.commands.push({ label: "gradle wrapper version", argv: ["./gradlew", "--version"], reason: "Verify the project Gradle wrapper is available." })
 	else if (indicatorFiles.some((file) => file.startsWith("build.gradle"))) {
@@ -718,9 +786,14 @@ async function detectJavaAndroidBootstrap(root: string): Promise<StackDetectionR
 		if (await commandExists("mvn")) detection.commands.push({ label: "maven version", argv: ["mvn", "--version"], reason: "Verify Maven is available for pom.xml projects." })
 		else detection.blockers.push(createBlocker("maven", "Required by pom.xml.", null))
 	}
-	if (isAndroid && !process.env.ANDROID_HOME && !process.env.ANDROID_SDK_ROOT) {
-		detection.missing_env_vars.push("ANDROID_HOME/ANDROID_SDK_ROOT")
-		detection.blockers.push(createBlocker("android-sdk", "Required by Android Gradle configuration.", "sdkmanager --install 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0'"))
+	if (isAndroid) {
+		const androidSdkPath = await discoverAndroidSdkPath()
+		if (androidSdkPath) {
+			detection.version_info.android_sdk_path = androidSdkPath
+		} else {
+			detection.missing_env_vars.push("ANDROID_HOME/ANDROID_SDK_ROOT")
+			detection.blockers.push(createBlocker("android-sdk", "Required by Android Gradle configuration.", "sdkmanager --install 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0'"))
+		}
 	}
 	return finalizeDetection(detection)
 }
@@ -958,8 +1031,9 @@ export default tool({
 			}
 		}
 
-		const fingerprint = await computeBootstrapFingerprint(root)
-		const blockers = detection.blockers
+			const fingerprintInputs = await describeBootstrapFingerprintInputs(root)
+			const fingerprint = await computeBootstrapFingerprint(root)
+			const blockers = detection.blockers
 		if (missingPrerequisites.size > 0) {
 			passed = false
 		}
@@ -975,7 +1049,7 @@ export default tool({
 							? "Dependency installation and bootstrap verification completed successfully in bootstrap-recovery mode."
 							: "Dependency installation and bootstrap verification completed successfully."
 						: "Bootstrap stopped on the first failing installation or readiness command. Inspect the captured output and fix the prerequisite or dependency error before smoke tests."
-		const body = renderArtifact(ticket.id, fingerprint, detection.detections, results, blockers, warnings, [...missingPrerequisites], passed, note)
+			const body = renderArtifact(ticket.id, fingerprint, fingerprintInputs, detection.detections, results, blockers, warnings, [...missingPrerequisites], passed, note)
 		const canonicalPath = normalizeRepoPath(defaultBootstrapProofPath(ticket.id))
 		await writeText(canonicalPath, body)
 
@@ -1004,8 +1078,9 @@ export default tool({
 				bootstrap_status: workflow.bootstrap.status,
 				recovery_mode: args.recovery_mode === true,
 				proof_artifact: artifact.path,
-				environment_fingerprint: fingerprint,
-				host_surface_classification: hostSurfaceClassification,
+					environment_fingerprint: fingerprint,
+					fingerprint_inputs: fingerprintInputs,
+					host_surface_classification: hostSurfaceClassification,
 				missing_prerequisites: [...missingPrerequisites],
 				blockers,
 				warnings,

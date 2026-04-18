@@ -1,0 +1,142 @@
+{
+  "generated_at": "2026-04-16T21:15:11Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 2,
+  "finding_codes": [
+    "EXEC-GODOT-006",
+    "EXEC-REMED-001"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "post_repair_verification",
+  "evidence_mode": "transcript_backed",
+  "audit_package_commit": "a7754f5955b5df9f7f37d19bb1969db2542d6825+dirty:83ca1f6fc93c",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-16T21:15:11Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "a7754f5955b5df9f7f37d19bb1969db2542d6825+dirty:83ca1f6fc93c",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 2,
+    "findings": [
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-015-review-review.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 0,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 2,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-016",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+      ]
+    },
+    {
+      "id": "REMED-017",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-015-review-review.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-015-review-review.md"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_source_follow_up",
+  "supporting_logs": [
+    "wvhvalog1.md"
+  ],
+  "verification_kind": "post_repair",
+  "repair_package_commit": "a7754f5955b5df9f7f37d19bb1969db2542d6825+dirty:83ca1f6fc93c",
+  "repair_basis_path": "/home/rowan/womanvshorseVA/diagnosis/20260416-204737",
+  "current_state_clean": false,
+  "causal_regression_verified": true,
+  "verification_basis": "transcript_backed",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

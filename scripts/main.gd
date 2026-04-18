@@ -11,6 +11,9 @@ const ARENA_INSET: int = 45
 const BORDER_THICKNESS: int = 3
 const BORDER_COLOR: Color = Color(1.0, 1.0, 1.0, 1.0)  # White
 const BACKGROUND_COLOR: Color = Color(0.05, 0.05, 0.1, 1.0)  # Dark blue-black
+const FLOOR_DOT_COLOR: Color = Color(0.12, 0.12, 0.18, 1.0)  # Slightly lighter than background
+const FLOOR_DOT_SPACING: float = 40.0
+const FLOOR_DOT_RADIUS: float = 1.5
 
 func _ready() -> void:
 	# Initial state is TITLE
@@ -160,6 +163,19 @@ func _draw() -> void:
 	var viewport_size = get_viewport_rect().size
 	var background_rect = Rect2(Vector2.ZERO, viewport_size)
 	draw_rect(background_rect, BACKGROUND_COLOR)
+	
+	# Draw subtle floor dot grid inside arena bounds
+	var dot_start_x: float = ARENA_INSET + BORDER_THICKNESS + 10.0
+	var dot_end_x: float = viewport_size.x - ARENA_INSET - BORDER_THICKNESS - 10.0
+	var dot_start_y: float = ARENA_INSET + BORDER_THICKNESS + 10.0
+	var dot_end_y: float = viewport_size.y - ARENA_INSET - BORDER_THICKNESS - 10.0
+	var x: float = dot_start_x
+	while x < dot_end_x:
+		var y: float = dot_start_y
+		while y < dot_end_y:
+			draw_circle(Vector2(x, y), FLOOR_DOT_RADIUS, FLOOR_DOT_COLOR)
+			y += FLOOR_DOT_SPACING
+		x += FLOOR_DOT_SPACING
 	
 	# Draw arena border as a white rectangle outline inset from viewport edges
 	var border_rect = Rect2(

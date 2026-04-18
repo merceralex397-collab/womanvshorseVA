@@ -1,4 +1,4 @@
-extends CanvasLayer
+extends Control
 
 signal score_changed(new_score: int)
 
@@ -44,7 +44,25 @@ func _draw() -> void:
 	for i in range(max_hearts):
 		var x: float = start_x + i * (heart_size + heart_spacing)
 		var color: Color = filled_color if i < _current_hp else empty_color
-		draw_circle(Vector2(x + heart_size / 2.0, start_y + heart_size / 2.0), heart_size / 2.0, color)
+		_draw_heart(Vector2(x + heart_size / 2.0, start_y + heart_size / 2.0), heart_size / 2.0, color)
+
+func _draw_heart(center: Vector2, radius: float, color: Color) -> void:
+	# Heart silhouette: two overlapping circles at top + triangle bottom
+	var top_radius: float = radius * 0.6
+	var circle1_center: Vector2 = center + Vector2(-radius * 0.4, -radius * 0.2)
+	var circle2_center: Vector2 = center + Vector2(radius * 0.4, -radius * 0.2)
+	# Draw two top circles
+	draw_circle(circle1_center, top_radius, color)
+	draw_circle(circle2_center, top_radius, color)
+	# Draw bottom triangle
+	var tip_y: float = center.y + radius * 0.7
+	var tip_x: float = center.x
+	var triangle_pts: PackedVector2Array = PackedVector2Array([
+		Vector2(center.x - radius * 0.6, center.y - radius * 0.1),
+		Vector2(center.x + radius * 0.6, center.y - radius * 0.1),
+		Vector2(tip_x, tip_y)
+	])
+	draw_colored_polygon(triangle_pts, color)
 
 func update_health(hp: int) -> void:
 	_current_hp = hp

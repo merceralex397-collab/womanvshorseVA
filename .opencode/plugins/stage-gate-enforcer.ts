@@ -13,9 +13,11 @@ import {
   isBlockingArtifactVerdict,
   isPlanApprovedForTicket,
   latestArtifact,
+  latestReviewArtifact,
   loadManifest,
   loadWorkflowState,
   readArtifactContent,
+  resolveAgentNameFromSession,
   resolveRequestedTicketProgress,
   ticketEligibleForTrustRestoration,
   ticketClaimBlockerArgs,
@@ -32,6 +34,7 @@ const BOOTSTRAP_RECOVERY_BASH = /^(uv|python|python3|pytest|ruff|\.venv\/bin\/py
 const LEASED_ARTIFACT_STAGES = new Set(["implementation", "bootstrap", "handoff"])
 const RESERVED_ARTIFACT_STAGES = new Set(["smoke-test"])
 const HISTORICAL_VERIFICATION_KINDS = new Set(["backlog-verification", "reverification"])
+const SPECIALIST_AUTHORED_STAGES = new Set(["planning", "plan_review", "implementation", "review", "qa"])
 
 function extractFilePath(args: Record<string, unknown>): string {
   const pathValue = args.filePath || args.path || args.target
@@ -52,6 +55,30 @@ function isBootstrapRecoveryCommand(command: string, bootstrapStatus: string): b
 }
 function isHistoricalVerificationArtifactMutation(ticket: ReturnType<typeof getTicket>, stage: string, kind: unknown): boolean {
   return ticket.status === "done" && ticket.resolution_state !== "open" && stage === "review" && typeof kind === "string" && HISTORICAL_VERIFICATION_KINDS.has(kind)
+}
+
+function expectedArtifactOwner(stage: string): string {
+  if (stage === "planning") return "the planner agent"
+  if (stage === "plan_review") return "the plan-review agent"
+  if (stage === "implementation") return "the implementer or lane-executor agent"
+  if (stage === "review") return "the assigned reviewer agent"
+  if (stage === "qa") return "the QA tester agent"
+  return "the assigned specialist agent"
+}
+
+async function ensureCoordinatorDoesNotAuthorStageArtifact(input: { agent?: string | null, sessionID?: string | null }, stage: string) {
+  const directAgent = typeof input.agent === "string" ? input.agent.trim() : ""
+  const resolvedAgent = directAgent || (await resolveAgentNameFromSession(input.sessionID)) || ""
+  const agentName = resolvedAgent.trim().toLowerCase()
+  if (!agentName || !SPECIALIST_AUTHORED_STAGES.has(stage)) {
+    return
+  }
+  if (!agentName.endsWith("-team-leader")) {
+    return
+  }
+  throw new Error(
+    `Coordinator-authored ${stage} artifacts are not allowed. The team leader must delegate this artifact body to ${expectedArtifactOwner(stage)} and wait for that specialist to use artifact_write/artifact_register.`,
+  )
 }
 
 async function ensureBootstrapReadyForValidation() {
@@ -101,6 +128,17 @@ async function ensureTargetTicketWriteLease(ticketId: string) {
       next_action_args: ticketClaimBlockerArgs(ticketId),
     })
   }
+}
+
+function sourceLeaseCoversSplitScopeTargetMutation(args: {
+  sourceTicket: ReturnType<typeof getTicket>
+  targetTicket: ReturnType<typeof getTicket>
+  replacementSourceTicket: ReturnType<typeof getTicket>
+}) {
+  return (
+    args.targetTicket.source_mode === "split_scope"
+    && args.targetTicket.source_ticket_id === args.sourceTicket.id
+  )
 }
 
 function isWorkflowProcessVerificationClearOnly(args: Record<string, unknown>): boolean {
@@ -161,9 +199,9 @@ export const StageGateEnforcer: Plugin = async () => {
           "managed_blocked_active",
           `Repair follow-on is managed_blocked. Next required stage: ${nextStage}. Reason: ${reason}. ` +
           `Allowed tools: ${[...MANAGED_BLOCKED_ALLOWED_TOOLS].join(", ")}, bash (read-only), read, write, edit, glob, grep, list. ` +
-          `To resolve: use repair_follow_on_refresh to assert stage completion once the required work is done or verified as already satisfied. ` +
-          `If the required stages are host-agent skills (project-skill-bootstrap, ticket-pack-builder, etc.) that you cannot invoke, ` +
-          `use repair_follow_on_refresh to assert them as completed with a justification, then resume normal work.`,
+          `To resolve: only use repair_follow_on_refresh after the repo already contains current-cycle canonical repair completion artifacts for the required stages. ` +
+          `Do not assert stage completion from plausibility. If a required host-agent stage (project-skill-bootstrap, ticket-pack-builder, etc.) has no current-cycle completion artifact yet, ` +
+          `stop and ask the host operator to finish that repair follow-on stage before resuming normal work.`,
           "repair_follow_on_refresh",
           {}
         )
@@ -321,10 +359,19 @@ export const StageGateEnforcer: Plugin = async () => {
         const sourceTicket = getTicket(manifest, sourceTicketId)
         const targetTicket = getTicket(manifest, targetTicketId)
         const replacementSourceTicket = replacementSourceTicketId ? getTicket(manifest, replacementSourceTicketId) : sourceTicket
+        const parentLeaseAuthorizesSplitChildMutation = sourceLeaseCoversSplitScopeTargetMutation({
+          sourceTicket,
+          targetTicket,
+          replacementSourceTicket,
+        })
         if (["open", "reopened"].includes(sourceTicket.resolution_state) && sourceTicket.status !== "done") {
           await ensureTargetTicketWriteLease(sourceTicket.id)
         }
-        if (["open", "reopened"].includes(targetTicket.resolution_state) && targetTicket.status !== "done") {
+        if (
+          ["open", "reopened"].includes(targetTicket.resolution_state)
+          && targetTicket.status !== "done"
+          && !parentLeaseAuthorizesSplitChildMutation
+        ) {
           await ensureTargetTicketWriteLease(targetTicket.id)
         }
         if (
@@ -343,6 +390,11 @@ export const StageGateEnforcer: Plugin = async () => {
         if (!ticketEligibleForTrustRestoration(ticket)) {
           throw new Error(`Ticket ${ticket.id} must still be a historical done or reopened ticket before ticket_reverify can restore trust.`)
         }
+        if (getTicketWorkflowState(workflow, ticket.id).needs_acceptance_refresh) {
+          throw new Error(
+            `Ticket ${ticket.id} still needs canonical acceptance refresh. Re-run ticket_update with acceptance=[...] before ticket_reverify can restore trust.`,
+          )
+        }
         const hasEvidenceArtifactPath = typeof output.args.evidence_artifact_path === "string" && output.args.evidence_artifact_path.trim()
         const hasVerificationContent = typeof output.args.verification_content === "string" && output.args.verification_content.trim()
         if (!hasEvidenceArtifactPath && !hasVerificationContent) {
@@ -356,6 +408,7 @@ export const StageGateEnforcer: Plugin = async () => {
         const ticket = getTicket(manifest, ticketId)
         const stage = typeof output.args.stage === "string" ? output.args.stage : ""
         const historicalVerificationMutation = isHistoricalVerificationArtifactMutation(ticket, stage, output.args.kind)
+        await ensureCoordinatorDoesNotAuthorStageArtifact(input, stage)
         if (RESERVED_ARTIFACT_STAGES.has(stage)) {
           const owner = stage === "smoke-test" ? "smoke_test" : "handoff_publish"
           throw new Error(`Use ${owner} to create ${stage} artifacts. Generic artifact_register is not allowed for that stage.`)
@@ -383,6 +436,7 @@ export const StageGateEnforcer: Plugin = async () => {
         const stage = typeof output.args.stage === "string" ? output.args.stage : ""
         const artifactPath = typeof output.args.path === "string" ? output.args.path : ""
         const historicalVerificationMutation = isHistoricalVerificationArtifactMutation(ticket, stage, output.args.kind)
+        await ensureCoordinatorDoesNotAuthorStageArtifact(input, stage)
         if (RESERVED_ARTIFACT_STAGES.has(stage)) {
           const owner = stage === "smoke-test" ? "smoke_test" : "handoff_publish"
           throw new Error(`Use ${owner} to create ${stage} artifacts. Generic artifact_write is not allowed for that stage.`)
@@ -405,6 +459,7 @@ export const StageGateEnforcer: Plugin = async () => {
           stage: typeof output.args.stage === "string" ? output.args.stage : undefined,
           status: typeof output.args.status === "string" ? output.args.status : undefined,
         })
+        const acceptanceProvided = Array.isArray(output.args.acceptance)
         const blockedTicketUnblockOnly = isBlockedTicketUnblockOnly(ticket, requested, output.args)
         if (!(processVerificationClearOnly && processVerification.clearable_now) && !blockedTicketUnblockOnly) {
           await ensureTargetTicketWriteLease(ticketId)
@@ -445,7 +500,9 @@ export const StageGateEnforcer: Plugin = async () => {
               `Cannot route ${ticket.id} back to implementation from ${backwardStage} — no ${backwardStage} artifact exists. Produce an artifact with a blocking verdict before routing backward.`,
             )
           }
-          const latestBackwardArtifact = latestArtifact(ticket, { stage: backwardStage, trust_state: "current" })
+          const latestBackwardArtifact = backwardStage === "review"
+            ? latestReviewArtifact(ticket)
+            : latestArtifact(ticket, { stage: backwardStage, trust_state: "current" })
           const backwardVerdict = extractArtifactVerdict(await readArtifactContent(latestBackwardArtifact))
           if (backwardVerdict.verdict_unclear) {
             throw new Error(
@@ -485,6 +542,16 @@ export const StageGateEnforcer: Plugin = async () => {
           await ensureBootstrapReadyForValidation()
         }
 
+        if (
+          getTicketWorkflowState(workflow, ticket.id).needs_acceptance_refresh
+          && ["review", "qa", "smoke-test", "closeout"].includes(requested.stage)
+          && !acceptanceProvided
+        ) {
+          throw new Error(
+            `Ticket ${ticket.id} still needs canonical acceptance refresh before it can advance to ${requested.stage}. Re-run ticket_update with acceptance=[...] first.`,
+          )
+        }
+
         if (getTicketWorkflowState(workflow, ticket.id).needs_reverification && requested.status === "done" && ticket.resolution_state !== "reopened") {
           throw new Error(`Ticket ${ticket.id} still needs reverification and cannot be closed from a non-reopened state.`)
         }
@@ -508,6 +575,10 @@ export const StageGateEnforcer: Plugin = async () => {
         )
         if (blockingReverification.length > 0) {
           throw new Error(`Cannot publish handoff while active or reopened tickets still need reverification: ${blockingReverification.map((ticket) => ticket.id).join(", ")}.`)
+        }
+        const acceptanceRefreshTickets = manifest.tickets.filter((ticket) => getTicketWorkflowState(workflow, ticket.id).needs_acceptance_refresh)
+        if (acceptanceRefreshTickets.length > 0) {
+          throw new Error(`Cannot publish handoff while canonical acceptance refresh remains pending for: ${acceptanceRefreshTickets.map((ticket) => ticket.id).join(", ")}.`)
         }
       }
     },

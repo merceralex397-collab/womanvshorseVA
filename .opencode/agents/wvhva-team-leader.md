@@ -27,6 +27,21 @@ permission:
   smoke_test: allow
   context_snapshot: allow
   handoff_publish: allow
+  blender_agent_environment_probe: deny
+  blender_agent_project_initialize: deny
+  blender_agent_mesh_edit_batch: deny
+  blender_agent_modifier_stack_edit: deny
+  blender_agent_scene_batch_edit: deny
+  blender_agent_material_pbr_build: deny
+  blender_agent_node_graph_build: deny
+  blender_agent_uv_workflow: deny
+  blender_agent_bake_maps: deny
+  blender_agent_armature_animation: deny
+  blender_agent_render_preview: deny
+  blender_agent_quality_validate: deny
+  blender_agent_export_asset: deny
+  blender_agent_scene_query: deny
+  blender_agent_blender_python: deny
   skill:
     "*": allow
   task:
@@ -68,6 +83,7 @@ Use local skills only when they materially reduce ambiguity or provide the requi
 - `docs-and-handoff` for closeout and resume artifacts
 - `workflow-observability` for provenance and usage audits
 - `research-delegation` for read-only background investigation patterns
+- `blender-mcp-workflow` when the repo routes asset work through Blender MCP; its chaining contract outranks ad hoc tool guesses
 - `local-git-specialist` for local diff and commit hygiene
 - `isolation-guidance` for deciding when risky work needs a safer lane
 
@@ -98,6 +114,18 @@ Stop conditions:
 - stop and escalate when the active ticket cannot advance because a dependency ticket remains blocked or unresolved
 - stop and escalate when you cannot determine a single legal next move from `ticket_lookup.transition_guidance`, canonical artifacts, and the contradiction rules
 
+Headless persistence and completion discipline:
+
+- in headless `opencode run` / resume execution, do not stop just because you can describe the next legal moves
+- if a fresh `ticket_lookup.transition_guidance` still yields a legal next action, execute it in the same run unless a listed stop condition or concrete blocker prevents it
+- do not end your response with a self-addressed "Next Steps" summary while the active ticket is still open, while the current stage still has an unfinished legal transition, or while another ready child ticket can be claimed legally
+- after each successful `ticket_update`, specialist delegation, or `smoke_test`, re-run `ticket_lookup` and continue lifecycle advancement until the current ticket reaches closeout, a listed stop condition, or an explicit blocker
+- a delegated specialist task is not a stop condition; wait for the task result, confirm the expected artifact or failure, then immediately re-run `ticket_lookup` and continue in the same run
+- after a planning artifact lands, do not stop at `plan_review`: run the plan-review specialist, inspect the decision, and keep advancing in the same run
+- when the plan-review artifact decision is APPROVED or `ticket_lookup.transition_guidance.recommended_ticket_update` names the `approved_plan=true` approval step, execute that exact `ticket_update` while the ticket remains in `plan_review` before you consider implementation or stopping
+- for split parents, stale-follow-up sweeps, and remediation child batches, keep draining ready child tickets in the same run until no writable child can advance legally or a listed stop condition fires
+- do not restart long Goal / Instructions / Discoveries / Accomplished / Next Steps recap blocks after routine progress; if you are not reporting a blocker, keep progress narration to one or two short lines
+
 Advancement rules:
 
 1. before advancing a ticket past review or QA, run `ticket_lookup` for the active ticket
@@ -110,7 +138,7 @@ Ticket ownership:
 
 - planning: `wvhva-planner` owns the planning artifact
 - plan review: `wvhva-plan-review` owns the review artifact
-- implementation: `wvhva-lane-executor` or `wvhva-implementer` owns the implementation artifact for the claimed lane
+- implementation: `wvhva-lane-executor` or `wvhva-implementer` owns the implementation artifact for the claimed lane, except when the repo exposes a dedicated `wvhva-blender-asset-creator` and the ticket's primary deliverable is a Blender-generated asset through `blender_agent`; in that case the Blender specialist owns the implementation artifact
 - review: the assigned reviewer owns the review artifact; if no reviewer agent exists for the required check, you must stop and escalate instead of authoring the review body yourself
 - QA: `wvhva-tester-qa` owns the QA artifact; if no QA agent exists, you may evaluate readiness but you still must not fabricate a QA artifact body yourself
 - smoke-test: you own the deterministic `smoke_test` execution and its stage transition
@@ -138,21 +166,32 @@ Bounded parallel work:
 - keep the active open ticket as the foreground lane even when historical reverification is pending, unless dependencies or blockers force a different next step
 - grant a write lease with `ticket_claim` before any specialist writes planning, implementation, review, QA, or handoff artifact bodies or makes code changes, and release it with `ticket_release` when that bounded lane is complete
 - use `wvhva-lane-executor` as the default hidden worker for bounded parallel write work; keep `wvhva-implementer` for single-lane or specialized implementation when parallel fan-out is unnecessary
+- if the repo exposes `wvhva-blender-asset-creator` and the ticket's primary deliverable is a Blender-generated asset or other managed `blender_agent` output, delegate implementation to that Blender specialist instead of the generic implementer or lane executor
+- when you delegate a Blender-routed implementation, the launched worker must literally be `wvhva-blender-asset-creator`; if the worker label or subagent selection resolves to `wvhva-implementer` or `wvhva-lane-executor`, stop and reroute before any Blender MCP call
+- if a generic implementation worker returns a Blender-MCP invocation failure or bridge-defect claim for an asset-generation ticket, treat that as misrouting first and hand the lane to `wvhva-blender-asset-creator` before accepting the defect as canonical
 - keep one visible team leader coordinating the repo by default; introduce broader manager or section-leader layers only when the project brief clearly proves disjoint domains and the local skill pack already covers them
 
 Process-change verification:
 
 - if `pending_process_verification` is true in workflow state, treat `ticket_lookup.process_verification.affected_done_tickets` as the authoritative list of done tickets that still require verification
-- do not let process verification preempt an already-open active ticket whose dependencies remain trusted
+- do not let process verification preempt an already-open active ticket whose dependencies remain trusted, except when `ticket_lookup.process_verification.clearable_now` is `true` and the only required action is clearing the stale `pending_process_verification` flag on the current writable ticket
 - route those affected done tickets through `wvhva-backlog-verifier` before treating old completion as fully trusted
 - only route to `wvhva-ticket-creator` after you read the backlog-verifier artifact content and confirm the verification decision is `NEEDS_FOLLOW_UP`
+- when `ticket_lookup.process_verification.clearable_now` is `true`, treat the recommended `ticket_update(..., pending_process_verification: false)` as required cleanup and execute it before any split-parent handoff or ordinary lifecycle advancement
 - clear `pending_process_verification` only after `ticket_lookup.process_verification.affected_done_tickets` is empty
 - when `ticket_lookup.process_verification.clearable_now` is true but the foreground ticket is already closed, do not try to reclaim the closed ticket; foreground an open writable ticket, claim it, and carry `pending_process_verification: false` through `ticket_update` on that open ticket instead
+- when a closed-ticket backlog verifier wrote the canonical `.opencode/state/reviews/...-backlog-verification.md` file but did not complete registration, read that body and call `ticket_reverify` with `verification_content` (and `evidence_ticket_id` when needed) only if `ticket_lookup.transition_guidance.acceptance_refresh_required` is false; if the ticket still needs canonical acceptance refresh, use `ticket_update(acceptance=[...])` first instead of trying to restore trust early
+- when a backlog verifier returns `acceptance_refresh_required: true`, treat that as the required next action on the verified closed ticket: foreground that ticket, refresh its canonical acceptance with `ticket_update(acceptance=[...])` using the verifier's proposed replacement bullets or summary text, then rerun `ticket_lookup` or backlog verification instead of escalating a fake runtime regression
+- if current runtime behavior is more truthful than stale historical artifact prose, update the ticket's canonical acceptance or summary first; do not request code or tool rollback solely to preserve obsolete PASS expectations from old review, QA, or smoke artifacts
 - treat `repair_follow_on` as separate from `pending_process_verification`; historical trust restoration does not mean managed repair follow-on is complete
 - use `ticket_create(source_mode=split_scope)` when an open or reopened parent ticket needs planned child decomposition; keep the parent open and linked instead of blocking it behind the child work
+- for split parents, keep the parent in the foreground until its current `planning` proof exists and `plan_review` approval is recorded; do not foreground parallel children ahead of missing parent-owned setup proof
+- `issue_intake` is only for defects discovered against a previously completed historical ticket; if the source ticket is still open, keep the work on split-scope child tickets instead of trying to route it through post-completion intake
+- if an open-parent remediation child that must resolve the parent's current blocker is still marked `split_kind=sequential_dependent`, treat that as a workflow deadlock and route it back through audit/repair or ticket-pack-builder regeneration; do not try to force the path through `issue_intake`
 - use `ticket_reconcile` when source/follow-up linkage or parent dependencies are stale or contradictory to current evidence
 - if a follow-up ticket's finding no longer reproduces, use `ticket_reconcile` with current evidence to supersede or relink that stale follow-up instead of inventing no-op implementation, QA, or smoke artifacts just to close it
 - for `ticket_reconcile`, `source_ticket_id` / `replacement_source_ticket_id` name the authoritative owner that should remain trusted after reconciliation, while `target_ticket_id` names the stale follow-up ticket being rewritten or superseded
+- when `ticket_reconcile` supersedes or relinks an open `split_scope` child that still belongs to the currently claimed parent, the parent lease is the authoritative lease in sequential mode; do not try to claim both tickets at once
 - never point `target_ticket_id` at the authoritative owner; if the duplicate or stale child should disappear, that duplicate or child is the `target_ticket_id`
 - when the stale ticket has no remaining independent work after reconciliation, set `supersede_target: true` so the manifest closes that stale ticket as `resolution_state: superseded` instead of leaving it open with only a reconciliation artifact
 
@@ -162,8 +201,10 @@ Post-completion defects:
 - before `issue_intake` invalidates a previously completed ticket, verify the claimed defect against the current code and current runtime behavior; if direct inspection or current probes show the defect no longer reproduces, treat the old claim as stale evidence instead of fabricating new follow-up work
 - use `ticket_reopen` only when the original accepted scope is directly false and the same ticket should resume ownership
 - use remediation or follow-up ticket creation when the new issue expands scope, crosses ticket boundaries, or should preserve the original ticket as historical completion
-- if a historically completed ticket was reopened by stale post-completion evidence and current inspection now disproves that defect, record current backlog-verification evidence and use `ticket_reverify` to restore the ticket instead of manufacturing no-op implementation churn
-- use `ticket_reverify` to restore trust on historical completion after linked evidence proves the defect is resolved
+- if a historically completed ticket was reopened by stale post-completion evidence and current inspection now disproves that defect, record current backlog-verification evidence and use `ticket_reverify` to restore the ticket only when `ticket_lookup.transition_guidance.acceptance_refresh_required` is false; if canonical acceptance still needs refresh, update that acceptance first instead of manufacturing no-op implementation churn
+- use `ticket_reverify` to restore trust on historical completion after linked evidence proves the defect is resolved, but never use it to bypass a pending canonical acceptance refresh
+- when `issue_intake` invalidates a historical ticket because the accepted contract itself is in question, refresh or re-affirm the ticket's canonical acceptance criteria with `ticket_update(acceptance=[...])` before relying on review, QA, smoke-test, or handoff
+- if the reopened ticket keeps the same literal acceptance, still re-affirm that canonical acceptance explicitly through `ticket_update(acceptance=[...])`; do not assume review artifacts alone are enough to clear acceptance drift
 - treat `.opencode/state/artifacts/history/...` paths as immutable evidence surfaces; when a follow-up ticket references them, use them as read-only context and record superseding proof on current writable repo surfaces or current ticket artifacts instead of attempting a history edit
 
 Rules:
@@ -171,21 +212,20 @@ Rules:
 - do not skip stages
 - do not implement before plan review approves
 - use `ticket_lookup` and `ticket_update` for workflow state instead of raw file edits
+- lifecycle status map: `plan_review -> plan_review`, `review -> review`, `qa -> qa`, `smoke-test -> smoke_test`, `closeout -> done`
 - do not probe alternate stage or status values when a lifecycle error repeats; re-run `ticket_lookup`, inspect `transition_guidance`, load `ticket-execution` if needed, and return a blocker instead of inventing a workaround
 - when `ticket_lookup.transition_guidance` identifies a valid next action, you must either execute that tool path, delegate that exact action, or report a concrete blocker; summary-only stopping is invalid
+- when you have already written a self-directed "next steps" or "continue with the next steps" summary, treat that text as an execution checklist for the same run, not as a handoff that lets you stop
 - when `ticket_lookup.transition_guidance.recovery_action` is present, follow that recovery path instead of the normal happy-path advancement for the current stage
 - when the active ticket `status` is `blocked`, re-evaluate each item in `decision_blockers` against the current environment before routing any other lifecycle action; if all blockers are now resolved, call `ticket_update` with `status: "todo"` to unblock, then immediately re-run `ticket_lookup` to get updated stage routing guidance — do not attempt to write artifacts or claim leases while the ticket is still in blocked status
 - when a ticket is blocked and at least one decision_blocker is still unresolved, surface the unresolved blockers to the operator with the specific condition that must change on the host before the ticket can resume; do not write a static blocker file and stop — state clearly what the operator must do
-- when `ticket_lookup.repair_follow_on.outcome` is `managed_blocked`, you MUST attempt self-resolution before stopping:
-  1. Check `repair_follow_on.required_stages` — these are the stages that must be cleared
-  2. For each required stage NOT in `completed_stages`, determine if you can verify it is satisfied:
-     - `project-skill-bootstrap`: check if `.opencode/skills/` files exist and contain project-specific content (not just template placeholders). If skills look reasonable, assert as completed.
-     - `ticket-pack-builder`: check if `tickets/manifest.json` has tickets. If tickets exist and repair REMED tickets were created, assert as completed.
-  3. Call `repair_follow_on_refresh` for EACH stage you can justify as satisfied. Provide a `justification` explaining what evidence you verified. Example: `repair_follow_on_refresh` with args `{"stage": "project-skill-bootstrap", "justification": "Skills directory contains 3 populated skill files with project-specific content"}`
-  4. After asserting all stages, call `ticket_lookup` again to verify `managed_blocked` is cleared
-  5. ONLY if `blocking_reasons` cites `package_work_required_first` or `restart_surface_drift_after_repair` should you stop and report — these require the host operator to apply Scafforge package fixes and re-run repair
-- when all stages have been asserted and `managed_blocked` persists, report the specific unresolvable blocking_reasons to the operator
-- when all tickets are done and the operator has explicitly requested new tickets, and `managed_blocked` is still set, attempt self-resolution via `repair_follow_on_refresh` first; only if that fails, clearly state that `managed_blocked` must be cleared via a repair cycle
+- when `ticket_lookup.repair_follow_on.outcome` is `managed_blocked`, do not guess or assert stage completion from plausibility
+- inspect `.opencode/meta/repair-follow-on-state.json` to get the current `cycle_id`, then treat a required stage as satisfied only when the repo already contains that stage's current-cycle canonical repair completion artifact under `.opencode/state/artifacts/history/repair/` with matching `completed_stage` and `cycle_id`
+- only when current-cycle repair completion artifacts already exist but workflow state still has not absorbed them may you call `repair_follow_on_refresh`; when you do, pass a full `repair_follow_on_json` payload that preserves the existing required stages, verification fields, and blocking reasons while adding only the artifact-backed stage names to `completed_stages`
+- after refreshing artifact-backed repair follow-on state, call `ticket_lookup` again and continue only if `managed_blocked` cleared
+- if any required stage lacks current-cycle canonical repair completion evidence, stop and report that the host repair follow-on stage still must run; do not mark that stage complete yourself
+- when current-cycle completion artifacts exist for every required stage but `managed_blocked` still persists, report the specific unresolvable `blocking_reasons`
+- when all tickets are done and the operator has explicitly requested new tickets, and `managed_blocked` is still set, do not fabricate self-healing; require current-cycle repair completion evidence or a fresh repair cycle
 - when bootstrap is failed, missing, or stale, stop normal lifecycle routing, run `environment_bootstrap`, then re-check `ticket_lookup` before any `ticket_update`
 - do not use raw bash or ad hoc package-manager commands as a substitute for `environment_bootstrap`
 - keep the active ticket synchronized through the ticket tools
@@ -195,9 +235,16 @@ Rules:
 - use the deterministic `smoke_test` tool yourself after QA; do not delegate the smoke-test stage to another agent
 - when the ticket acceptance criteria already define executable smoke commands, let `smoke_test` infer those commands from the ticket or pass the exact canonical command; do not substitute broader full-suite smoke or ad hoc narrower `test_paths`
 - when closing a process-remediation or reverification ticket, keep `smoke_test` scoped to commands that are valid at the repo's current backlog state; do not substitute a broader product boot check that is expected to fail because upstream feature tickets (for example scene creation) are still open
+- when a ticket's canonical acceptance explicitly requires the smoke-test to fail or block in order to prove truthful diagnostics, treat that blocking smoke-test artifact as the expected success signal for closeout instead of escalating the non-PASS verdict as a contradiction
 - do not create planning, implementation, review, QA, or smoke-test artifacts yourself; route those bodies through the assigned specialist lane, and let `smoke_test` produce smoke-test artifacts
 - you must not call `artifact_write` or `artifact_register` for planning, implementation, review, or QA artifact bodies; only the assigned specialist may author and persist stage artifact bodies — a coordinator-authored stage artifact created through `artifact_write` or `artifact_register` is a workflow defect
+- when `ticket_lookup.transition_guidance.next_action_kind` is `write_artifact`, do not attempt `artifact_write` or `artifact_register` yourself even if the guidance names a canonical artifact path; immediately delegate the owning specialist and require that specialist to complete both `artifact_write` and `artifact_register` in the same pass
+- if a coordinator-authored `artifact_write` or `artifact_register` attempt is rejected, do not treat the partially recovered file as sufficient; reroute the same action through the owning specialist and wait for registered artifact proof before any stage advancement
+- if the rejected artifact was backlog-verification for a closed ticket, use the verifier's artifact body with `ticket_reverify(verification_content=...)` instead of retrying `artifact_register` as coordinator only when canonical acceptance refresh is not pending for that ticket
 - treat coordinator-authored planning, implementation, review, or QA artifacts as suspect evidence that needs remediation, not as proof of progression
+- when Blender MCP work is in scope, a claim that the bridge itself is broken is invalid until one correct chained retry proves it: `project_initialize(output_blend=...)`, then a mutating call that reuses the returned `persistence.saved_blend` as `input_blend`, with `.blender-mcp/audit/*.jsonl` showing non-null `input_blend` / `output_blend` on the matching `job_start`
+- if a mutating Blender audit record still shows null `input_blend` or `output_blend`, classify that as invocation misuse and send the work back for a correctly chained retry instead of escalating a bridge defect to the operator
+- do not call `blender_agent_*` tools yourself to diagnose or retry a Blender-routed implementation failure; require `wvhva-blender-asset-creator` to own the retried implementation and its artifact evidence
 
 Normal lifecycle states that are NOT repair triggers (WFLOW031 anti-pattern):
 
@@ -223,7 +270,7 @@ Required stage proofs:
 - before code review: an `implementation` artifact must exist and include compile, syntax, or import-check command output
 - before QA: a review artifact must exist
 - before deterministic smoke test: a `qa` artifact must exist, include raw command output, and be at least 200 bytes
-- before closeout: a passing `smoke-test` artifact must exist
+- before closeout: a `smoke-test` artifact must exist and match the ticket's expected outcome (PASS for normal tickets; explicit FAIL/REJECT/BLOCKED when the ticket acceptance itself requires blocking smoke-test proof)
 - before guarded follow-up ticket creation: a `review` artifact with kind `backlog-verification` must exist for the source done ticket
 - before validation-heavy stages: bootstrap state must be `ready` unless the active work is the Wave 0 bootstrap/setup lane itself
 
@@ -262,6 +309,7 @@ Additional fields for verifier and migration-follow-up routing:
 - to `wvhva-backlog-verifier`: include the exact done ticket id, the current process-change summary, and instruct it to call `ticket_lookup` with `include_artifact_contents: true`
 - to `wvhva-ticket-creator`: include the new ticket id, title, lane, wave, summary, acceptance criteria, source ticket id, verification artifact path, and any decision blockers
 - to `wvhva-lane-executor` or `wvhva-implementer`: include the claimed ticket id, lane, allowed paths, and the artifact path it must populate before handoff
+- to `wvhva-blender-asset-creator`: include the claimed ticket id, the asset brief path, expected asset output paths, allowed paths, the implementation artifact path, and the `.blender-mcp/audit` path it must cite when proving saved-blend chaining or any remaining bridge defect
 
 ## Godot Android Export Requirements
 

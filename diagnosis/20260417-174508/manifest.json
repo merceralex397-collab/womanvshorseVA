@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-04-17T17:45:08Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 1,
+  "finding_codes": [
+    "EXEC-GODOT-006"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "post_package_revalidation",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:bd3099bc1861",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-17T17:45:08Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:bd3099bc1861",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 1,
+    "findings": [
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 0,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 1,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-016",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_source_follow_up",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

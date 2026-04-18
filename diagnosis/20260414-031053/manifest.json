@@ -1,0 +1,215 @@
+{
+  "generated_at": "2026-04-14T03:10:53Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 4,
+  "finding_codes": [
+    "EXEC-GODOT-006",
+    "EXEC-REMED-001",
+    "FINISH004",
+    "WFLOW026"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "initial_diagnosis",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "fa5689ef34144135ff674b4da4efe060ce103721+dirty:5004537ee0d7",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-14T03:10:53Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "fa5689ef34144135ff674b4da4efe060ce103721+dirty:5004537ee0d7",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 4,
+    "findings": [
+      {
+        "code": "FINISH004",
+        "severity": "error",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "docs/spec/CANONICAL-BRIEF.md",
+          "tickets/manifest.json"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "WFLOW026",
+        "severity": "error",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          ".opencode/lib/workflow.ts",
+          "tickets/manifest.json",
+          ".opencode/state/artifacts/history/core-006/qa/2026-04-10T11-15-15-323Z-qa.md",
+          ".opencode/state/artifacts/history/remed-001/review/2026-04-09T22-34-31-076Z-review.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 2,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 2,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-006",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ]
+    },
+    {
+      "id": "REMED-002",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ]
+    },
+    {
+      "id": "REMED-007",
+      "title": "Interactive consumer-facing repo still relies on a weak generic finish bar instead of explicit interaction-proof requirements",
+      "description": "Remediate FINISH004 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "docs/spec/CANONICAL-BRIEF.md",
+        "tickets/manifest.json"
+      ],
+      "suggested_fix_approach": "Replace generic machine-generated finish_acceptance_signals with repo-specific interactive proof requirements, and require FINISH-VALIDATE-001 to demand user-observable interaction evidence in addition to load/export proof.",
+      "assignee": "implementer",
+      "source_finding_code": "FINISH004",
+      "source_finding_codes": [
+        "FINISH004"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Replace generic machine-generated finish_acceptance_signals with repo-specific interactive proof requirements, and require FINISH-VALIDATE-001 to demand user-observable interaction evidence in addition to load/export proof.",
+      "source_files": [
+        "docs/spec/CANONICAL-BRIEF.md",
+        "tickets/manifest.json"
+      ]
+    },
+    {
+      "id": "REMED-008",
+      "title": "Current artifacts contain explicit verdict headings or labels, but the generated verdict extractor still reports them as unclear",
+      "description": "Remediate WFLOW026 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        ".opencode/lib/workflow.ts",
+        "tickets/manifest.json",
+        ".opencode/state/artifacts/history/core-006/qa/2026-04-10T11-15-15-323Z-qa.md",
+        ".opencode/state/artifacts/history/remed-001/review/2026-04-09T22-34-31-076Z-review.md"
+      ],
+      "suggested_fix_approach": "Keep one shared artifact verdict extractor that accepts the real artifact family in use: plain and markdown-emphasized verdict labels, compact `QA/Review + verdict` headings, and `Overall: PASS/FAIL` labels. Route ticket_lookup and ticket_update through that shared parser instead of treating explicit review or QA verdicts as unclear.",
+      "assignee": "implementer",
+      "source_finding_code": "WFLOW026",
+      "source_finding_codes": [
+        "WFLOW026"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Keep one shared artifact verdict extractor that accepts the real artifact family in use: plain and markdown-emphasized verdict labels, compact `QA/Review + verdict` headings, and `Overall: PASS/FAIL` labels. Route ticket_lookup and ticket_update through that shared parser instead of treating explicit review or QA verdicts as unclear.",
+      "source_files": [
+        ".opencode/lib/workflow.ts",
+        "tickets/manifest.json",
+        ".opencode/state/artifacts/history/core-006/qa/2026-04-10T11-15-15-323Z-qa.md",
+        ".opencode/state/artifacts/history/remed-001/review/2026-04-09T22-34-31-076Z-review.md"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_repair",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

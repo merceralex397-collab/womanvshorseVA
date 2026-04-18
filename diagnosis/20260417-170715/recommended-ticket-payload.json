@@ -1,0 +1,62 @@
+[
+  {
+    "id": "REMED-016",
+    "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+    "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      "project.godot",
+      ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+    ],
+    "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+    "assignee": "implementer",
+    "source_finding_code": "EXEC-GODOT-006",
+    "source_finding_codes": [
+      "EXEC-GODOT-006"
+    ],
+    "severity": "error",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+    "source_files": [
+      "project.godot",
+      ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+    ]
+  },
+  {
+    "id": "REMED-017",
+    "title": "Current artifacts contain explicit verdict headings or labels, but the generated verdict extractor still reports them as unclear",
+    "description": "Remediate WFLOW026 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      ".opencode/lib/workflow.ts",
+      "tickets/manifest.json",
+      ".opencode/state/artifacts/history/core-006/qa/2026-04-10T11-15-15-323Z-qa.md",
+      ".opencode/state/artifacts/history/release-001/review/2026-04-15T23-43-32-408Z-backlog-verification.md",
+      ".opencode/state/artifacts/history/remed-001/review/2026-04-09T22-34-31-076Z-review.md",
+      ".opencode/state/artifacts/history/remed-002/review/2026-04-15T23-41-13-671Z-review.md",
+      ".opencode/state/artifacts/history/audio-001/qa/2026-04-16T00-08-22-033Z-qa.md",
+      ".opencode/state/artifacts/history/audio-001/review/2026-04-17T03-31-59-253Z-backlog-verification.md",
+      ".opencode/state/artifacts/history/remed-013/qa/2026-04-17T03-08-27-116Z-qa.md"
+    ],
+    "suggested_fix_approach": "Keep one shared artifact verdict extractor that accepts the real artifact family in use: plain and markdown-emphasized verdict labels, compact `QA/Review + verdict` headings, `## Decision` headings with the verdict on the next line, and `Overall: PASS/FAIL` labels. Route ticket_lookup and ticket_update through that shared parser instead of treating explicit review or QA verdicts as unclear.",
+    "assignee": "implementer",
+    "source_finding_code": "WFLOW026",
+    "source_finding_codes": [
+      "WFLOW026"
+    ],
+    "severity": "error",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Keep one shared artifact verdict extractor that accepts the real artifact family in use: plain and markdown-emphasized verdict labels, compact `QA/Review + verdict` headings, `## Decision` headings with the verdict on the next line, and `Overall: PASS/FAIL` labels. Route ticket_lookup and ticket_update through that shared parser instead of treating explicit review or QA verdicts as unclear.",
+    "source_files": [
+      ".opencode/lib/workflow.ts",
+      "tickets/manifest.json",
+      ".opencode/state/artifacts/history/core-006/qa/2026-04-10T11-15-15-323Z-qa.md",
+      ".opencode/state/artifacts/history/release-001/review/2026-04-15T23-43-32-408Z-backlog-verification.md",
+      ".opencode/state/artifacts/history/remed-001/review/2026-04-09T22-34-31-076Z-review.md",
+      ".opencode/state/artifacts/history/remed-002/review/2026-04-15T23-41-13-671Z-review.md",
+      ".opencode/state/artifacts/history/audio-001/qa/2026-04-16T00-08-22-033Z-qa.md",
+      ".opencode/state/artifacts/history/audio-001/review/2026-04-17T03-31-59-253Z-backlog-verification.md",
+      ".opencode/state/artifacts/history/remed-013/qa/2026-04-17T03-08-27-116Z-qa.md"
+    ]
+  }
+]

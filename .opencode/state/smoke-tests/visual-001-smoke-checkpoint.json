@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "ticket_id": "VISUAL-001",
+  "qa_artifact": ".opencode/state/artifacts/history/visual-001/qa/2026-04-15T23-52-58-075Z-qa.md",
+  "scope": "full-suite",
+  "test_paths": [],
+  "command_signatures": [
+    "godot4 --headless --path . --quit"
+  ],
+  "commands_total": 1,
+  "commands_completed": 1,
+  "completed": true,
+  "passed": true,
+  "updated_at": "2026-04-17T03:30:27.905Z",
+  "commands": [
+    {
+      "label": "qa artifact command 1",
+      "argv": [
+        "godot4",
+        "--headless",
+        "--path",
+        ".",
+        "--quit"
+      ],
+      "reason": "Current QA artifact records a deterministic smoke-test command.",
+      "exit_code": 0,
+      "duration_ms": 260,
+      "stdout": "Godot Engine v4.6.1.stable.official.14d19694e - https://godotengine.org\n\n",
+      "stderr": "SCRIPT ERROR: Parse Error: Could not parse global class \"EnemyBase\" from \"res://scripts/enemy_base.gd\".\n          at: GDScript::reload (res://scripts/wave_spawner.gd:77)\nSCRIPT ERROR: Parse Error: Could not parse global class \"EnemyBase\" from \"res://scripts/enemy_base.gd\".\n          at: GDScript::reload (res://scripts/wave_spawner.gd:95)\nSCRIPT ERROR: Parse Error: Could not resolve class \"EnemyBrown\", because of a parser error.\n          at: GDScript::reload (res://scripts/wave_spawner.gd:79)\nSCRIPT ERROR: Parse Error: Could not resolve class \"EnemyBlack\", because of a parser error.\n          at: GDScript::reload (res://scripts/wave_spawner.gd:80)\nSCRIPT ERROR: Parse Error: Could not resolve class \"EnemyWar\", because of a parser error.\n          at: GDScript::reload (res://scripts/wave_spawner.gd:81)\nSCRIPT ERROR: Parse Error: Could not resolve class \"EnemyBoss\", because of a parser error.\n          at: GDScript::reload (res://scripts/wave_spawner.gd:82)\nSCRIPT ERROR: Parse Error: Could not resolve class \"EnemyBrown\", because of a parser error.\n          at: GDScript::reload (res://scripts/wave_spawner.gd:83)\nERROR: Failed to load script \"res://scripts/wave_spawner.gd\" with error \"Parse error\".\n   at: load (modules/gdscript/gdscript.cpp:2907)\n",
+      "failure_classification": "tooling_parse_warning"
+    }
+  ]
+}

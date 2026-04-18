@@ -23,7 +23,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
     var player = get_tree().get_first_node_in_group("player")
     if player:
-        var direction := (player.global_position - global_position).normalized()
+        var direction: Vector2 = (player.global_position - global_position).normalized()
         velocity = direction * speed
         move_and_slide()
         if direction != Vector2.ZERO:
@@ -58,14 +58,15 @@ func _create_visual() -> void:
     add_child(head)
 
 func take_damage(amount: int) -> void:
-    health -= amount
-    _is_flashing = true
-    _flash_timer = 0.15
-    modulate = Color(1.5, 1.5, 1.5)
-    if health <= 0:
-        enemy_died.emit(self)
-        _spawn_death_effects()
-        queue_free()
+	health -= amount
+	_is_flashing = true
+	_flash_timer = 0.15
+	modulate = Color(1.5, 1.5, 1.5)
+	if health <= 0:
+		AudioManager.play_death_sfx()
+		enemy_died.emit(self)
+		_spawn_death_effects()
+		queue_free()
 
 func _spawn_death_effects() -> void:
     # 8-10 particles: randi() % 3 yields 0-2

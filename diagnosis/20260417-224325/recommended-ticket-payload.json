@@ -1,0 +1,25 @@
+[
+  {
+    "id": "REMED-020",
+    "title": "Repo is in managed_blocked deadlock: all unresolved required follow-on stages are host-only, so the local agent has zero legal moves",
+    "description": "Remediate WFLOW030 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      ".opencode/state/workflow-state.json",
+      ".opencode/tools/ticket_update.ts"
+    ],
+    "suggested_fix_approach": "Host-operator must: (1) run the required host-only stages (project-skill-bootstrap via Scafforge), (2) update repair_follow_on.completed_stages in workflow-state.json, and (3) set outcome to 'clean' or 'source_follow_up' once all stages are done. After that the local agent regains ticket mutation access.",
+    "assignee": "implementer",
+    "source_finding_code": "WFLOW030",
+    "source_finding_codes": [
+      "WFLOW030"
+    ],
+    "severity": "error",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Host-operator must: (1) run the required host-only stages (project-skill-bootstrap via Scafforge), (2) update repair_follow_on.completed_stages in workflow-state.json, and (3) set outcome to 'clean' or 'source_follow_up' once all stages are done. After that the local agent regains ticket mutation access.",
+    "source_files": [
+      ".opencode/state/workflow-state.json",
+      ".opencode/tools/ticket_update.ts"
+    ]
+  }
+]

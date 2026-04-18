@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-16T20:36:03Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "audit_package_commit": "b9f1187c3f67f023d2aeb089e14832b77ba34cc3+dirty:6c3d97f0102f",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 3,
+  "findings": [
+    {
+      "code": "SKILL001",
+      "severity": "warning",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        ".opencode/skills/stack-standards/SKILL.md"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-015-review-review.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 3,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 0,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": [
+    {
+      "code": "EXEC-GODOT-006",
+      "legacy_disposition_class": "source_follow_up",
+      "disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "reason": "Legacy prefix classification would label EXEC-GODOT-006 as source_follow_up, but the authoritative bundle assigns managed_blocker."
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "legacy_disposition_class": "source_follow_up",
+      "disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "reason": "Legacy prefix classification would label EXEC-REMED-001 as source_follow_up, but the authoritative bundle assigns managed_blocker."
+    }
+  ]
+}

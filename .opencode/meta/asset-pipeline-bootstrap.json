@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "asset_root": "assets",
+  "pipeline_path": "assets/pipeline.json",
+  "provenance_path": "assets/PROVENANCE.md",
+  "briefs_dir": "assets/briefs",
+  "stack_label": "godot-2d-android-game",
+  "target_platform": "android",
+  "route_mode": "single-route",
+  "routes": {
+    "characters": "godot-native-authored",
+    "environments": "godot-native-authored",
+    "props": "godot-native-authored",
+    "ui": "godot-native-authored",
+    "audio": "godot-native-authored",
+    "vfx": "godot-native-authored"
+  },
+  "route_families": [
+    "godot_native"
+  ],
+  "brief_targets": [],
+  "requires_blender_mcp": false,
+  "suggested_agents": [
+    "godot-finish-implementer"
+  ],
+  "suggested_skills": [],
+  "provenance_requirements": {
+    "machine_readable": "assets/pipeline.json",
+    "human_readable": "assets/PROVENANCE.md",
+    "briefs_dir": "assets/briefs",
+    "previews_dir": "assets/previews",
+    "workfiles_dir": "assets/workfiles",
+    "licenses_dir": "assets/licenses",
+    "import_reports_dir": "assets/import-reports",
+    "route_specific_finish_proof_required": true
+  },
+  "tool_license_policy": {
+    "allow_open_source_tools": true,
+    "allow_commercial_tools": false,
+    "notes": "Record tool licenses separately from model/checkpoint licenses when AI-assisted generation is used."
+  },
+  "model_license_policy": {
+    "allow_open_weights": true,
+    "allow_noncommercial_weights": false,
+    "notes": "If AI-assisted generation is used, record the exact model or checkpoint license separately from the tool stack."
+  },
+  "previews_dir": "assets/previews",
+  "workfiles_dir": "assets/workfiles",
+  "licenses_dir": "assets/licenses",
+  "import_reports_dir": "assets/import-reports",
+  "initialized_by": "skills/asset-pipeline/scripts/init_asset_pipeline.py"
+}

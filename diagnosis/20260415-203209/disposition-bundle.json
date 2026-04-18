@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-15T20:32:09Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:28002026c917",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 0,
+  "findings": [],
+  "counts": {
+    "managed_blocker": 0,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 0,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": []
+}

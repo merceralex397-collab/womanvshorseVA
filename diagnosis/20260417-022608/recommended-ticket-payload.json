@@ -1,0 +1,46 @@
+[
+  {
+    "id": "REMED-016",
+    "title": "Remediation review artifact does not contain runnable command evidence",
+    "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      "tickets/manifest.json",
+      ".opencode/state/reviews/remed-015-review-review.md"
+    ],
+    "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+    "assignee": "implementer",
+    "source_finding_code": "EXEC-REMED-001",
+    "source_finding_codes": [
+      "EXEC-REMED-001"
+    ],
+    "severity": "error",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+    "source_files": [
+      "tickets/manifest.json",
+      ".opencode/state/reviews/remed-015-review-review.md"
+    ]
+  },
+  {
+    "id": "REMED-017",
+    "title": "One or more repo-local skills still contain generic placeholder text or stale synthesized guidance instead of current project-specific procedure",
+    "description": "Remediate SKILL001 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      ".opencode/skills/stack-standards/SKILL.md"
+    ],
+    "suggested_fix_approach": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+    "assignee": "implementer",
+    "source_finding_code": "SKILL001",
+    "source_finding_codes": [
+      "SKILL001"
+    ],
+    "severity": "warning",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+    "source_files": [
+      ".opencode/skills/stack-standards/SKILL.md"
+    ]
+  }
+]

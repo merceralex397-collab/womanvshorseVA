@@ -101,12 +101,14 @@ func _setup_attacks() -> void:
     _attack_controller.connect("ranged_attack", _on_ranged_attack)
 
 func _on_melee_attack(facing: Vector2) -> void:
-    var arc = load("res://scripts/melee_arc.gd").new()
-    add_child(arc)
-    arc.rotation = facing.angle()
+	AudioManager.play_attack_sfx()
+	var arc = load("res://scripts/melee_arc.gd").new()
+	add_child(arc)
+	arc.rotation = facing.angle()
 
 func _on_ranged_attack(facing: Vector2) -> void:
-    var proj = load("res://scripts/projectile.gd").new()
+	AudioManager.play_attack_sfx()
+	var proj = load("res://scripts/projectile.gd").new()
     proj.velocity = facing * proj.speed
     proj.position = position + facing * 30
     get_parent().add_child(proj)  # Add to parent so it moves independently
@@ -129,10 +131,11 @@ func _flash_damage() -> void:
     tween.tween_callback(func(): modulate = Color.WHITE)
 
 func take_damage(amount: int) -> void:
-    if _is_invincible:
-        return
-    
-    hp -= amount
+	if _is_invincible:
+		return
+	
+	AudioManager.play_player_hit_sfx()
+	hp -= amount
     _is_invincible = true
     _invincibility_timer = _invincibility_duration
     health_changed.emit(hp)

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-15T03:17:49Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:d35d46277e67",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 5,
+  "findings": [
+    {
+      "code": "CONFIG010",
+      "severity": "warning",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "assets/briefs",
+        "assets/models",
+        "assets/sprites",
+        "assets/audio",
+        "assets/fonts",
+        "assets/themes",
+        "assets/previews",
+        "assets/workfiles",
+        "assets/licenses",
+        "assets/import-reports",
+        "assets/pipeline.json",
+        "assets/PROVENANCE.md",
+        "assets/briefs/README.md",
+        ".opencode/meta/asset-pipeline-bootstrap.json"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "CONFIG011",
+      "severity": "warning",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "opencode.jsonc"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-GODOT-009",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "project.godot",
+        "scripts/hud.gd",
+        "scripts/hud.gd",
+        "scripts/wave_spawner.gd"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 2,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 3,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": []
+}

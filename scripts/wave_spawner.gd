@@ -1,5 +1,5 @@
 class_name WaveSpawner
-extends Node
+extends Node2D
 
 signal wave_started(wave_number: int)
 signal enemies_alive_changed(count: int)
@@ -19,11 +19,12 @@ var _point_values: Dictionary = {
 }
 
 func _ready() -> void:
-	start_next_wave()
+	call_deferred("start_next_wave")
 
 func start_next_wave() -> void:
 	wave_number += 1
 	wave_started.emit(wave_number)
+	AudioManager.play_wave_start_sfx()
 	_spawn_wave_enemies()
 
 func _spawn_wave_enemies() -> void:

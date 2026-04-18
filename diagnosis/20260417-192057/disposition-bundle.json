@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-17T19:20:57Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:0863e004cc5b",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 1,
+  "findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error",
+      "disposition_class": "source_follow_up",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 0,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 1,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": []
+}

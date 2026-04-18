@@ -35,7 +35,6 @@ Core rules:
   - QA writes `qa`
   - `smoke_test` is the only legal producer of `smoke-test`
 - if the ticket acceptance criteria already define executable smoke commands, treat those commands as canonical smoke scope; let `smoke_test` infer them or pass the exact canonical command instead of improvising broader full-suite smoke or ad hoc narrower `test_paths`
-- for this Godot Android game, smoke scope includes `godot4 --headless --export-debug "Android Debug"` to verify APK compilation and project integrity
 - if execution or validation cannot run, return a blocker or open risk; do not convert expected results into PASS evidence
 - do not claim that a command ran unless its output is present in the canonical artifact
 - slash commands are human entrypoints, not internal autonomous workflow tools
@@ -63,7 +62,7 @@ Transition contract:
   - latest QA verdict must be PASS or APPROVED; FAIL, REJECT, BLOCKED, or an unclear verdict must route back to implementation or manual inspection before smoke-test
 - `smoke-test`:
   - required proof before exit: a current smoke-test artifact produced by `smoke_test`
-  - next legal transition: `ticket_update stage=closeout`
+  - next legal transition: `ticket_update stage=closeout status=done`
 - `closeout`:
   - required proof before exit: a passing smoke-test artifact
   - expected final state: `status=done`
@@ -80,7 +79,7 @@ Failure recovery paths:
 
 Remediation ticket closeout:
 
-- when a ticket carries `finding_source`, treat it as a remediation or reverification ticket
+- when a remediation ticket carries `finding_source`, treat it as a remediation or reverification ticket
 - identify the original finding code before closeout and rerun the command or check that originally produced that finding
 - include the rerun output and whether the original error signature is gone in the closeout evidence
 - if the finding-specific rerun still fails, do not close the ticket; route back to implementation with the fresh command output
@@ -102,13 +101,17 @@ Parallel rules:
 
 Process-change rules:
 
-- if `pending_process_verification` is `true`, verify affected done tickets before trusting their completion
+- if `pending_process_verification` is `true` and `ticket_lookup.process_verification.clearable_now` is `true`, clear the stale flag immediately via the recommended `ticket_update(..., pending_process_verification: false)` on the current writable ticket before any other lifecycle or split-parent action
+- if `pending_process_verification` is `true` and `ticket_lookup.process_verification.clearable_now` is not `true`, verify affected done tickets before trusting their completion
 - if `repair_follow_on.outcome` is `managed_blocked`, stop ordinary lifecycle routing and surface the canonical blocker before continuing ticket work
 - `repair_follow_on.outcome == source_follow_up` does not by itself block the active open ticket from continuing
 - migration follow-up tickets must come from backlog-verifier proof through `ticket_create`, not raw manifest edits
 - use `ticket_create(source_mode=split_scope)` when an open or reopened parent ticket needs planned child decomposition
+- if a split parent still lacks its own planning artifact or recorded plan approval, keep the parent foregrounded until that setup is complete before activating a parallel child lane
 - use `ticket_reconcile` when evidence proves an existing follow-up graph is stale or contradictory
+- when `ticket_reconcile` is superseding or relinking an open `split_scope` child from the currently claimed parent ticket, the parent lease is the authoritative write lease; do not try to claim both tickets in sequential mode
 - previously completed tickets are not fully trusted again until backlog verification says so
+- when post-completion defect intake invalidates the ticket's accepted contract, the team leader must refresh or re-affirm the canonical acceptance criteria through `ticket_update(acceptance=[...])` before review, QA, smoke-test, closeout, or handoff can be treated as truthful
 
 Bootstrap gate:
 

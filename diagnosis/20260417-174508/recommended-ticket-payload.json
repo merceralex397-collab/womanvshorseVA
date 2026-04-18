@@ -1,0 +1,25 @@
+[
+  {
+    "id": "REMED-016",
+    "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+    "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      "project.godot",
+      ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+    ],
+    "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+    "assignee": "implementer",
+    "source_finding_code": "EXEC-GODOT-006",
+    "source_finding_codes": [
+      "EXEC-GODOT-006"
+    ],
+    "severity": "error",
+    "route": "ticket-pack-builder",
+    "repair_class": "generated-repo remediation ticket",
+    "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+    "source_files": [
+      "project.godot",
+      ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+    ]
+  }
+]

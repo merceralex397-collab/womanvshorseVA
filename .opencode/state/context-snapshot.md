@@ -6,37 +6,38 @@ Woman vs Horse VA
 
 ## Active Ticket
 
-- ID: REMED-002
-- Title: Remediation review artifact does not contain runnable command evidence
-- Stage: planning
-- Status: todo
-- Resolution: open
-- Verification: suspect
-- Approved plan: no
+- ID: REMED-019
+- Title: Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence
+- Stage: closeout
+- Status: done
+- Resolution: done
+- Verification: trusted
+- Approved plan: yes
 - Needs reverification: no
-- Open split children: REMED-004, REMED-005
+- Needs acceptance refresh: no
+- Open split children: none
 
 ## Bootstrap
 
 - status: ready
-- last_verified_at: 2026-04-10T04:55:58.711Z
-- proof_artifact: .opencode/state/artifacts/history/ui-001/bootstrap/2026-04-10T04-55-58-711Z-environment-bootstrap.md
+- last_verified_at: 2026-04-17T22:54:03.772Z
+- proof_artifact: .opencode/state/artifacts/history/remed-013/bootstrap/2026-04-17T22-54-03-771Z-environment-bootstrap.md
 - blockers: none
 
 ## Process State
 
 - process_version: 7
-- pending_process_verification: true
+- pending_process_verification: false
 - parallel_mode: sequential
-- state_revision: 215
+- state_revision: 413
 
 ## Repair Follow-On
 
 - outcome: source_follow_up
 - required: no
 - next_required_stage: none
-- verification_passed: false
-- last_updated_at: 2026-04-12T03:46:07Z
+- verification_passed: true
+- last_updated_at: 2026-04-17T22:54:05Z
 
 ## Pivot State
 
@@ -57,4 +58,8 @@ Woman vs Horse VA
 
 ## Recent Artifacts
 
-- No artifacts recorded yet
+- qa: .opencode/state/artifacts/history/remed-019/qa/2026-04-17T21-15-35-010Z-qa.md (qa) - QA verification PASS — godot4 headless exit_code=0 with fatal script-load error correctly classified as syntax_error (blocking). isClassNameReloadParseWarning early-exits at line 589 when fatal diagnostics present. Smoke test FAILS as expected. EXEC-GODOT-006 fixed.
+- smoke-test: .opencode/state/artifacts/history/remed-019/smoke-test/2026-04-17T21-15-51-727Z-smoke-test.md (smoke-test) [superseded] - Deterministic smoke test failed.
+- smoke-test: .opencode/state/artifacts/history/remed-019/smoke-test/2026-04-17T22-59-26-981Z-smoke-test.md (smoke-test) - Deterministic smoke test failed.
+- backlog-verification: .opencode/state/artifacts/history/remed-019/review/2026-04-17T22-59-41-558Z-backlog-verification.md (review)
+- reverification: .opencode/state/artifacts/history/remed-019/review/2026-04-17T23-00-06-796Z-reverification.md (review) - Trust restored using REMED-019.

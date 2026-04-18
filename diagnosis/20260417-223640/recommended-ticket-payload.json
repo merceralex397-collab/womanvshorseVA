@@ -1,0 +1,23 @@
+[
+  {
+    "id": "REMED-020",
+    "title": "One or more repo-local skills still contain generic placeholder text or stale synthesized guidance instead of current project-specific procedure",
+    "description": "Remediate SKILL001 by correcting the validated issue and rerunning the relevant quality checks.",
+    "affected_files": [
+      ".opencode/skills/stack-standards/SKILL.md"
+    ],
+    "suggested_fix_approach": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+    "assignee": "implementer",
+    "source_finding_code": "SKILL001",
+    "source_finding_codes": [
+      "SKILL001"
+    ],
+    "severity": "warning",
+    "route": "scafforge-repair",
+    "repair_class": "safe Scafforge package change",
+    "summary": "Populate every required repo-local skill with concrete current rules and validation commands; generated `.opencode/skills/` files must not retain template filler or stale synthesized workflow guidance.",
+    "source_files": [
+      ".opencode/skills/stack-standards/SKILL.md"
+    ]
+  }
+]

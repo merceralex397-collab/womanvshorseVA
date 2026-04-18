@@ -29,9 +29,11 @@ import {
   reconcileStaleStageIfNeeded,
   repairFollowOnBlockingReason,
   readArtifactContent,
+  selectForegroundTicket,
   ticketNeedsHistoricalReconciliation,
   ticketNeedsTrustRestoration,
   ticketNeedsProcessVerification,
+  ticketExpectsBlockingSmokeResult,
   validateImplementationArtifactEvidence,
   validateReviewArtifactEvidence,
   validateLifecycleStageStatus,
@@ -39,10 +41,22 @@ import {
   validateSmokeTestArtifactEvidence,
 } from "../lib/workflow"
 
+function parentMustFinishPreImplementationSetup(
+  ticket: ReturnType<typeof getTicket>,
+  approvedPlan: boolean,
+) {
+  if (ticket.status === "done") return false
+  if (ticket.stage === "planning") return true
+  if (ticket.stage === "plan_review" && !approvedPlan) return true
+  return false
+}
+
 async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, workflow: Awaited<ReturnType<typeof loadWorkflowState>>) {
   const manifest = await loadManifest()
   const blocker = validateLifecycleStageStatus(ticket.stage, ticket.status)
   const approvedPlan = isPlanApprovedForTicket(workflow, ticket.id)
+  const ticketState = getTicketWorkflowState(workflow, ticket.id)
+  const needsAcceptanceRefresh = ticketState.needs_acceptance_refresh === true
   const processVerification = getProcessVerificationState(manifest, workflow, ticket.id)
   const needsProcessVerification = processVerification.current_ticket_requires_verification
   const ticketNeedsReconciliation = ticketNeedsHistoricalReconciliation(ticket)
@@ -63,7 +77,8 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
     current_stage: ticket.stage,
     current_status: ticket.status,
     approved_plan: approvedPlan,
-    pending_process_verification: needsProcessVerification,
+    acceptance_refresh_required: needsAcceptanceRefresh,
+    pending_process_verification: processVerification.pending,
     current_state_blocker: blocker,
     next_allowed_stages: [] as string[],
     required_artifacts: [] as string[],
@@ -83,6 +98,12 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
     verdict_unclear: false,
   }
 
+  if (needsAcceptanceRefresh) {
+    base.warnings.push(
+      `Canonical acceptance for ${ticket.id} must be refreshed or re-affirmed through ticket_update before downstream review and closeout should be treated as truthful.`,
+    )
+  }
+
   if (bootstrapStatus !== "ready") {
     return {
       ...base,
@@ -97,21 +118,52 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
     }
   }
 
-  // parallel_independent children run alongside the parent — foreground the child so it
-  // advances first.  sequential_dependent children must wait for the parent's own work to
-  // complete, so the parent stays in the foreground and we emit a warning instead.
-  if (parallelSplitChildren.length > 0 && ticket.status !== "done") {
-    const foregroundChild = parallelSplitChildren[0]
+  if (processVerification.clearable_now && ticket.status !== "done") {
     return {
       ...base,
-      next_allowed_stages: [foregroundChild.stage],
+      next_allowed_stages: [],
       required_artifacts: [],
       next_action_kind: "ticket_update",
       next_action_tool: "ticket_update",
       delegate_to_agent: null,
       required_owner: "team-leader",
-        recommended_action: `Keep ${ticket.id} open as a split parent and foreground child ticket ${foregroundChild.id} instead of advancing the parent lane directly.`,
-      recommended_ticket_update: { ticket_id: foregroundChild.id, activate: true },
+      recommended_action: "No historical done tickets remain affected by process verification. Clear pending_process_verification on the current writable ticket now, then rerun ticket_lookup before continuing normal lifecycle routing.",
+      recommended_ticket_update: {
+        ticket_id: ticket.id,
+        activate: true,
+        pending_process_verification: false,
+      },
+    }
+  }
+
+  // parallel_independent children can run alongside the parent only after the parent has
+  // completed its own pre-implementation setup. Weak models were repeatedly misrouted when
+  // split children preempted a parent that still lacked a planning artifact or recorded
+  // plan approval, so keep the parent foregrounded until that setup is complete.
+  if (parallelSplitChildren.length > 0 && parentMustFinishPreImplementationSetup(ticket, approvedPlan)) {
+    const foregroundChild = parallelSplitChildren[0]
+    base.warnings.push(
+      `Parallel split child ticket ${foregroundChild.id} is ready, but ${ticket.id} must finish its own ${ticket.stage} obligations before the child becomes the foreground lane.`,
+    )
+  }
+
+  // parallel_independent children run alongside the parent after the parent has completed
+  // its own pre-implementation setup. sequential_dependent children must wait for the
+  // parent's own work to complete, so the parent stays in the foreground and we emit a warning instead.
+  if (parallelSplitChildren.length > 0 && ticket.status !== "done") {
+    const foregroundChild = parallelSplitChildren[0]
+    if (!parentMustFinishPreImplementationSetup(ticket, approvedPlan)) {
+      return {
+        ...base,
+        next_allowed_stages: [foregroundChild.stage],
+        required_artifacts: [],
+        next_action_kind: "ticket_update",
+        next_action_tool: "ticket_update",
+        delegate_to_agent: null,
+        required_owner: "team-leader",
+        recommended_action: `Parent setup is complete. Keep ${ticket.id} open as a split parent and foreground child ticket ${foregroundChild.id} for the next executable lane.`,
+        recommended_ticket_update: { ticket_id: foregroundChild.id, activate: true },
+      }
     }
   }
 
@@ -164,7 +216,7 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
   // switch and produces misleading "write artifact" guidance for a ticket that has
   // unresolved decision_blockers — leaving the agent with no legal forward move.
   if (ticket.status === "blocked") {
-    const unresolvedBlockers: string[] = (ticket as any).decision_blockers ?? []
+    const unresolvedBlockers: string[] = ticket.decision_blockers ?? []
     const blockerSummary = unresolvedBlockers.length > 0
       ? unresolvedBlockers.map((b: string, i: number) => `${i + 1}. ${b}`).join("\n")
       : "(none recorded — status may have been set manually)"
@@ -255,6 +307,20 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
           current_state_blocker: implementationBlocker,
         }
       }
+      if (needsAcceptanceRefresh) {
+        return {
+          ...base,
+          next_allowed_stages: ["implementation"],
+          required_artifacts: ["implementation", "canonical acceptance refresh"],
+          next_action_kind: "ticket_update",
+          next_action_tool: "ticket_update",
+          delegate_to_agent: null,
+          required_owner: "team-leader",
+          recommended_action: "Refresh or re-affirm the ticket's canonical acceptance criteria through ticket_update(acceptance=[...]) before entering review so the manifest and ticket markdown match the reopened ticket's actual acceptance contract.",
+          recommended_ticket_update: { ticket_id: ticket.id, activate: true },
+          current_state_blocker: "Canonical acceptance still needs explicit refresh before review.",
+        }
+      }
       return {
         ...base,
         next_allowed_stages: ["review"],
@@ -268,6 +334,20 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
       }
     }
     case "review":
+      if (needsAcceptanceRefresh) {
+        return {
+          ...base,
+          next_allowed_stages: ["review"],
+          required_artifacts: ["canonical acceptance refresh"],
+          next_action_kind: "ticket_update",
+          next_action_tool: "ticket_update",
+          delegate_to_agent: null,
+          required_owner: "team-leader",
+          recommended_action: "Refresh or re-affirm the ticket's canonical acceptance criteria through ticket_update before relying on review approval.",
+          recommended_ticket_update: { ticket_id: ticket.id, activate: true },
+          current_state_blocker: "Canonical acceptance still needs explicit refresh before review can advance.",
+        }
+      }
       if (!hasReviewArtifact(ticket)) {
         return {
           ...base,
@@ -353,6 +433,20 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
         review_verdict: reviewVerdict,
       }
     case "qa": {
+      if (needsAcceptanceRefresh) {
+        return {
+          ...base,
+          next_allowed_stages: ["qa"],
+          required_artifacts: ["canonical acceptance refresh"],
+          next_action_kind: "ticket_update",
+          next_action_tool: "ticket_update",
+          delegate_to_agent: null,
+          required_owner: "team-leader",
+          recommended_action: "Refresh or re-affirm the ticket's canonical acceptance criteria through ticket_update before relying on QA approval.",
+          recommended_ticket_update: { ticket_id: ticket.id, activate: true },
+          current_state_blocker: "Canonical acceptance still needs explicit refresh before QA can advance.",
+        }
+      }
       const qaBlocker = await validateQaArtifactEvidence(ticket)
       if (qaBlocker) {
         return {
@@ -418,6 +512,21 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
       }
     }
     case "smoke-test": {
+      const expectsBlockingSmokeResult = ticketExpectsBlockingSmokeResult(ticket)
+      if (needsAcceptanceRefresh) {
+        return {
+          ...base,
+          next_allowed_stages: ["smoke-test"],
+          required_artifacts: ["canonical acceptance refresh"],
+          next_action_kind: "ticket_update",
+          next_action_tool: "ticket_update",
+          delegate_to_agent: null,
+          required_owner: "team-leader",
+          recommended_action: "Refresh or re-affirm the ticket's canonical acceptance criteria through ticket_update before relying on smoke-test closeout.",
+          recommended_ticket_update: { ticket_id: ticket.id, activate: true },
+          current_state_blocker: "Canonical acceptance still needs explicit refresh before closeout.",
+        }
+      }
       const smokeBlocker = await validateSmokeTestArtifactEvidence(ticket)
       if (smokeBlocker) {
         return {
@@ -431,7 +540,7 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
           canonical_artifact_path: defaultArtifactPath(ticket.id, "smoke-test", "smoke-test"),
           artifact_stage: "smoke-test",
           artifact_kind: "smoke-test",
-          recommended_action: "Use the smoke_test tool to produce the current smoke-test artifact. Do not fabricate a PASS artifact through generic artifact tools.",
+          recommended_action: "Use the smoke_test tool to produce the current smoke-test artifact. Do not fabricate the expected smoke-test result through generic artifact tools.",
           current_state_blocker: smokeBlocker,
         }
       }
@@ -443,11 +552,27 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
         next_action_tool: "ticket_update",
         delegate_to_agent: null,
         required_owner: "team-leader",
-        recommended_action: "Move the ticket into closeout/done now that a passing smoke-test artifact exists.",
-        recommended_ticket_update: { ticket_id: ticket.id, stage: "closeout", activate: true },
+        recommended_action: expectsBlockingSmokeResult
+          ? "Move the ticket into closeout now with status `done` now that the smoke-test artifact records the expected blocking result for this ticket's acceptance."
+          : "Move the ticket into closeout now with status `done` now that a passing smoke-test artifact exists.",
+        recommended_ticket_update: { ticket_id: ticket.id, stage: "closeout", status: "done", activate: true },
       }
     }
     case "closeout":
+      if (ticket.status === "done" && needsAcceptanceRefresh) {
+        return {
+          ...base,
+          next_allowed_stages: ["closeout"],
+          required_artifacts: ["canonical acceptance refresh"],
+          next_action_kind: "ticket_update",
+          next_action_tool: "ticket_update",
+          delegate_to_agent: null,
+          required_owner: "team-leader",
+          recommended_action: "Ticket is already closed, but canonical acceptance refresh is still pending. Refresh or re-affirm the ticket's canonical acceptance criteria through ticket_update(acceptance=[...]) before relying on historical trust restoration, restart publication, or handoff.",
+          recommended_ticket_update: { ticket_id: ticket.id, activate: true },
+          current_state_blocker: "Canonical acceptance still needs explicit refresh before the closed ticket can be treated as truthful.",
+        }
+      }
       if (ticket.status === "done" && ticketNeedsReconciliation) {
         return {
           ...base,
@@ -535,8 +660,8 @@ async function buildTransitionGuidance(ticket: ReturnType<typeof getTicket>, wor
         next_action_tool: ticket.status === "done" ? null : "ticket_update",
         delegate_to_agent: null,
         required_owner: "team-leader",
-        recommended_action: ticket.status === "done" ? "Ticket is already closed." : "Finish closeout and mark the ticket done.",
-        recommended_ticket_update: ticket.status === "done" ? null : { ticket_id: ticket.id, stage: "closeout", activate: true },
+        recommended_action: ticket.status === "done" ? "Ticket is already closed." : "Finish closeout with status `done`.",
+        recommended_ticket_update: ticket.status === "done" ? null : { ticket_id: ticket.id, stage: "closeout", status: "done", activate: true },
       }
     default:
       return {
@@ -559,7 +684,9 @@ export default tool({
   async execute(args) {
     const manifest = await loadManifest()
     const workflow = await loadWorkflowState()
-    const ticket = getTicket(manifest, args.ticket_id)
+    const ticket = typeof args.ticket_id === "string" && args.ticket_id.trim()
+      ? getTicket(manifest, args.ticket_id)
+      : selectForegroundTicket(manifest, workflow, manifest.active_ticket)
     const latestPlan = latestArtifact(ticket, { stage: "planning" }) || null
     const latestImplementation = latestArtifact(ticket, { stage: "implementation" }) || null
     const latestReview = latestReviewArtifact(ticket) || null

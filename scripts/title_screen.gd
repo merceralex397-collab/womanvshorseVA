@@ -55,6 +55,17 @@ func _setup_ui() -> void:
 	start_button.connect("pressed", Callable(self, "_on_start_pressed"))
 	add_child(start_button)
 	
+	# Create decorative separator line between title and button
+	var separator = ColorRect.new()
+	separator.name = "Separator"
+	separator.color = Color(1.0, 1.0, 1.0, 0.3)
+	separator.set_anchors_preset(Control.PRESET_CENTER)
+	separator.offset_left = -200
+	separator.offset_right = 200
+	separator.offset_top = 28
+	separator.offset_bottom = 32
+	add_child(separator)
+	
 	# Start visible
 	show_title()
 

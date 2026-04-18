@@ -17,11 +17,12 @@ func _physics_process(delta: float) -> void:
         queue_free()
 
 func _on_hit_enemy(body: Node2D) -> void:
-    if body.has_method("take_damage"):
-        body.take_damage(1)
-        # Spawn hit particles at impact point
-        HitParticle.spawn_hit_particles(get_parent(), body.global_position, 5)
-    queue_free()
+	if body.has_method("take_damage"):
+		body.take_damage(1)
+		AudioManager.play_hit_sfx()
+		# Spawn hit particles at impact point
+		HitParticle.spawn_hit_particles(get_parent(), body.global_position, 5)
+	queue_free()
 
 func _draw() -> void:
     # Yellow circle visual (radius 8)

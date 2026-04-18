@@ -1,0 +1,291 @@
+{
+  "generated_at": "2026-04-16T15:32:03Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 6,
+  "finding_codes": [
+    "BOOT003",
+    "EXEC-GODOT-006",
+    "EXEC-REMED-001",
+    "FINISH002",
+    "FINISH004"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "initial_diagnosis",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "2bdef2533fc214601e4bc795eb74b0520494e382+dirty:4249b1de26b4",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-16T15:32:03Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "2bdef2533fc214601e4bc795eb74b0520494e382+dirty:4249b1de26b4",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 6,
+    "findings": [
+      {
+        "code": "FINISH004",
+        "severity": "error",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "docs/spec/CANONICAL-BRIEF.md",
+          "tickets/manifest.json"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "FINISH002",
+        "severity": "error",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "docs/spec/CANONICAL-BRIEF.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "BOOT003",
+        "severity": "error",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          ".opencode/state/workflow-state.json",
+          "project.godot",
+          "export_presets.cfg",
+          "opencode.jsonc"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-014-review-review.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-015-review-review.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 3,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 3,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-016",
+      "title": "The generated bootstrap freshness contract cannot detect host drift for this repo",
+      "description": "Remediate BOOT003 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        ".opencode/state/workflow-state.json",
+        "project.godot",
+        "export_presets.cfg",
+        "opencode.jsonc"
+      ],
+      "suggested_fix_approach": "Hash stack-sensitive repo surfaces plus host-side prerequisite signals so bootstrap becomes stale when the machine setup changes, then rerun environment_bootstrap after package repair installs the stronger freshness model.",
+      "assignee": "implementer",
+      "source_finding_code": "BOOT003",
+      "source_finding_codes": [
+        "BOOT003"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Hash stack-sensitive repo surfaces plus host-side prerequisite signals so bootstrap becomes stale when the machine setup changes, then rerun environment_bootstrap after package repair installs the stronger freshness model.",
+      "source_files": [
+        ".opencode/state/workflow-state.json",
+        "project.godot",
+        "export_presets.cfg",
+        "opencode.jsonc"
+      ]
+    },
+    {
+      "id": "REMED-017",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-16T13-25-37-427Z-smoke-test.md"
+      ]
+    },
+    {
+      "id": "REMED-018",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-014-review-review.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-014-review-review.md"
+      ]
+    },
+    {
+      "id": "REMED-019",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-015-review-review.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-015-review-review.md"
+      ]
+    },
+    {
+      "id": "REMED-020",
+      "title": "Repo claims ready or finished state, but the finish contract forbids placeholder output and finish-owning tickets are still open",
+      "description": "Remediate FINISH002 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "docs/spec/CANONICAL-BRIEF.md"
+      ],
+      "suggested_fix_approach": "Either close or supersede the open finish tickets with real content proof, or update the restart narrative to stop claiming finished-product ready state until the finish bar is met.",
+      "assignee": "implementer",
+      "source_finding_code": "FINISH002",
+      "source_finding_codes": [
+        "FINISH002"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Either close or supersede the open finish tickets with real content proof, or update the restart narrative to stop claiming finished-product ready state until the finish bar is met.",
+      "source_files": [
+        "docs/spec/CANONICAL-BRIEF.md"
+      ]
+    },
+    {
+      "id": "REMED-021",
+      "title": "Interactive consumer-facing repo still relies on a weak generic finish bar instead of explicit interaction-proof requirements",
+      "description": "Remediate FINISH004 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "docs/spec/CANONICAL-BRIEF.md",
+        "tickets/manifest.json"
+      ],
+      "suggested_fix_approach": "Replace generic machine-generated finish_acceptance_signals with repo-specific interactive proof requirements, and require FINISH-VALIDATE-001 to demand user-observable interaction evidence in addition to load/export proof.",
+      "assignee": "implementer",
+      "source_finding_code": "FINISH004",
+      "source_finding_codes": [
+        "FINISH004"
+      ],
+      "severity": "error",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Replace generic machine-generated finish_acceptance_signals with repo-specific interactive proof requirements, and require FINISH-VALIDATE-001 to demand user-observable interaction evidence in addition to load/export proof.",
+      "source_files": [
+        "docs/spec/CANONICAL-BRIEF.md",
+        "tickets/manifest.json"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_repair",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

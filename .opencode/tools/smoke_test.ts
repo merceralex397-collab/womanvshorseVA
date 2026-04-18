@@ -41,7 +41,7 @@ type CommandResult = CommandSpec & {
   stdout: string
   stderr: string
   missing_executable?: string
-  failure_classification?: "missing_executable" | "permission_restriction" | "syntax_error" | "test_failure" | "configuration_error" | "command_error"
+  failure_classification?: "missing_executable" | "permission_restriction" | "syntax_error" | "tooling_parse_warning" | "test_failure" | "configuration_error" | "command_error"
   blocked_by_permissions?: boolean
 }
 
@@ -56,9 +56,24 @@ type SmokeArgs = {
   test_paths?: string[]
   command_override?: string[]
 }
+type SmokeCheckpoint = {
+  version: number
+  ticket_id: string
+  qa_artifact: string
+  scope: string | null
+  test_paths: string[]
+  command_signatures: string[]
+  commands_total: number
+  commands_completed: number
+  completed: boolean
+  passed: boolean | null
+  updated_at: string
+  commands: CommandResult[]
+}
 
 const SMOKE_STAGE = "smoke-test"
 const SMOKE_KIND = "smoke-test"
+const SMOKE_CHECKPOINT_VERSION = 1
 const ENV_ASSIGNMENT_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*=.*/
 const SMOKE_COMMAND_PATTERNS = [
   /\bpytest\b/i,
@@ -204,6 +219,25 @@ function renderCommand(command: Pick<CommandSpec, "argv" | "env_overrides">): st
   return `${envPrefix ? `${envPrefix} ` : ""}${command.argv.join(" ")}`.trim()
 }
 
+function smokeCheckpointPath(ticketId: string): string {
+  const fileName = `${ticketId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-smoke-checkpoint.json`
+  return normalizeRepoPath(join(".opencode", "state", "smoke-tests", fileName))
+}
+
+function commandSignature(command: Pick<CommandSpec, "argv" | "env_overrides">): string {
+  return renderCommand(command)
+}
+
+async function loadSmokeCheckpoint(ticketId: string): Promise<SmokeCheckpoint | undefined> {
+  return readJson<SmokeCheckpoint>(join(rootPath(), smokeCheckpointPath(ticketId)))
+}
+
+async function saveSmokeCheckpoint(checkpoint: SmokeCheckpoint): Promise<string> {
+  const path = smokeCheckpointPath(checkpoint.ticket_id)
+  await writeText(path, JSON.stringify(checkpoint, null, 2))
+  return path
+}
+
 function isPermissionRestrictionOutput(output: string): boolean {
   return /permission denied|operation not permitted|EACCES|EPERM|blocked by permission rules/i.test(output)
 }
@@ -227,6 +261,63 @@ function inferAcceptanceSmokeCommands(ticket: { acceptance?: unknown }): Command
       })
       seen.add(normalized)
     }
+  }
+
+  return commands
+}
+
+function extractQaArtifactCommandCandidates(text: string): string[] {
+  const candidates = new Set<string>()
+  for (const match of text.matchAll(/^\s*[-*]?\s*"command"\s*:\s*("(?:(?:\\.)|[^"])*")\s*,?\s*$/gim)) {
+    try {
+      const candidate = JSON.parse(match[1] || "")
+      if (!candidate || !looksLikeSmokeCommand(candidate)) continue
+      candidates.add(candidate)
+    } catch {
+      // Ignore malformed JSON command lines and keep scanning for other usable command evidence.
+    }
+  }
+
+  for (const pattern of [
+    /^\s*[-*]?\s*(?:Run|Command):\s*`?(.+?)`?\s*$/gim,
+    /^\s*[-*]?\s*command:\s*(.+?)\s*$/gim,
+    /^\s*\$\s+(.+?)\s*$/gm,
+  ]) {
+    for (const match of text.matchAll(pattern)) {
+      const candidate = (match[1] || "").trim().replace(/,$/, "")
+      if (!candidate || !looksLikeSmokeCommand(candidate)) continue
+      candidates.add(candidate)
+    }
+  }
+
+  for (const candidate of extractBacktickedCommands(text)) {
+    const normalized = candidate.trim()
+    if (!normalized || !looksLikeSmokeCommand(normalized)) continue
+    candidates.add(normalized)
+  }
+
+  return [...candidates]
+}
+
+function inferQaArtifactSmokeCommands(qaArtifactText: string): CommandSpec[] {
+  const commands: CommandSpec[] = []
+  const seen = new Set<string>()
+
+  for (const candidate of extractQaArtifactCommandCandidates(qaArtifactText)) {
+    let parsed: CommandSpec
+    try {
+      parsed = parseCommandOverride([candidate])[0]
+    } catch {
+      continue
+    }
+    const key = renderCommand(parsed).toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    commands.push({
+      ...parsed,
+      label: `qa artifact command ${commands.length + 1}`,
+      reason: "Current QA artifact records a deterministic smoke-test command.",
+    })
   }
 
   return commands
@@ -487,6 +578,20 @@ function isConfigurationErrorOutput(output: string): boolean {
   return /configuration error|invalid config|misconfig|unknown option|invalid argument|requires a value/i.test(output)
 }
 
+function isGodotFatalDiagnosticOutput(output: string): boolean {
+  return /SCRIPT ERROR:.*(?:not declared in the current scope|not found in base self|could not parse global class|could not resolve class)/i.test(output)
+    || /Parse Error:\s*(?:Could not parse global class|Could not resolve class)/i.test(output)
+    || /Failed to load script/i.test(output)
+}
+
+function isClassNameReloadParseWarning(output: string, exitCode: number): boolean {
+  if (exitCode !== 0) return false
+  if (isGodotFatalDiagnosticOutput(output)) return false
+  return /Could not parse global class/i.test(output)
+    && /Could not resolve class/i.test(output)
+    && /GDScript::reload/i.test(output)
+}
+
 function classifyCommandFailure(args: {
   argv: string[]
   exitCode: number
@@ -498,9 +603,13 @@ function classifyCommandFailure(args: {
   const output = `${args.stdout}\n${args.stderr}`
   if (args.missingExecutable) return "missing_executable"
   if (args.blockedByPermissions) return "permission_restriction"
+  if (args.exitCode === 0) {
+    if (isGodotFatalDiagnosticOutput(output) || isSyntaxErrorOutput(output)) return "syntax_error"
+    if (isClassNameReloadParseWarning(output, args.exitCode)) return "tooling_parse_warning"
+    return undefined
+  }
   if (isSyntaxErrorOutput(output)) return "syntax_error"
   if (isConfigurationErrorOutput(output)) return "configuration_error"
-  if (args.exitCode === 0) return undefined
   if (output.trim()) return "test_failure"
   return "command_error"
 }
@@ -540,13 +649,17 @@ function parseCommandOverride(rawOverride: string[]): CommandSpec[] {
   return rawOverride.map((command, index) => parseOverrideTokens(tokenizeCommandString(command), `command override ${index + 1}`))
 }
 
-async function detectCommands(root: string, ticket: { acceptance?: unknown }, args: SmokeArgs): Promise<CommandSpec[]> {
+async function detectCommands(root: string, ticket: { acceptance?: unknown }, args: SmokeArgs, qaArtifactText: string): Promise<CommandSpec[]> {
   if (Array.isArray(args.command_override) && args.command_override.length > 0) {
     return augmentGodotReleaseCommands(root, ticket, parseCommandOverride(args.command_override))
   }
   const acceptanceCommands = await detectAcceptanceCommands(root, ticket)
   if (acceptanceCommands.length > 0) {
     return augmentGodotReleaseCommands(root, ticket, acceptanceCommands)
+  }
+  const qaArtifactCommands = inferQaArtifactSmokeCommands(qaArtifactText)
+  if (qaArtifactCommands.length > 0) {
+    return augmentGodotReleaseCommands(root, ticket, qaArtifactCommands)
   }
   const makeOverride = await detectMakeSmokeTarget(root)
   if (makeOverride.length > 0) {
@@ -755,10 +868,11 @@ export default tool({
     if (!latestQaArtifact) {
       throw new Error(`Cannot run smoke tests for ${ticket.id} before a QA artifact exists.`)
     }
+    const qaArtifactText = await readText(join(root, latestQaArtifact.path))
 
     let commands: CommandSpec[] = []
     try {
-      commands = await detectCommands(root, ticket, args)
+      commands = await detectCommands(root, ticket, args, qaArtifactText)
     } catch (error) {
       const body = renderArtifact(
         ticket.id,
@@ -805,16 +919,52 @@ export default tool({
       )
     }
 
-    const results: CommandResult[] = []
-    let passed = true
-    for (const command of commands) {
+    const commandSignatures = commands.map((command) => commandSignature(command))
+    const checkpoint = await loadSmokeCheckpoint(ticket.id)
+    const resumableCheckpoint = checkpoint
+      && checkpoint.version === SMOKE_CHECKPOINT_VERSION
+      && checkpoint.completed === false
+      && checkpoint.qa_artifact === latestQaArtifact.path
+      && JSON.stringify(checkpoint.command_signatures) === JSON.stringify(commandSignatures)
+      && Array.isArray(checkpoint.commands)
+      && checkpoint.commands.length <= commands.length
+    const results: CommandResult[] = resumableCheckpoint ? [...checkpoint.commands] : []
+    const resumedFromCheckpoint = results.length > 0
+
+    await saveSmokeCheckpoint({
+      version: SMOKE_CHECKPOINT_VERSION,
+      ticket_id: ticket.id,
+      qa_artifact: latestQaArtifact.path,
+      scope: args.scope || (args.test_paths && args.test_paths.length > 0 ? "ticket" : "full-suite"),
+      test_paths: args.test_paths || [],
+      command_signatures: commandSignatures,
+      commands_total: commands.length,
+      commands_completed: results.length,
+      completed: false,
+      passed: null,
+      updated_at: new Date().toISOString(),
+      commands: results,
+    })
+
+    for (const command of commands.slice(results.length)) {
       const result = await runCommand(root, command)
       results.push(result)
-      if (commandBlocksPass(result)) {
-        passed = false
-        break
-      }
+      await saveSmokeCheckpoint({
+        version: SMOKE_CHECKPOINT_VERSION,
+        ticket_id: ticket.id,
+        qa_artifact: latestQaArtifact.path,
+        scope: args.scope || (args.test_paths && args.test_paths.length > 0 ? "ticket" : "full-suite"),
+        test_paths: args.test_paths || [],
+        command_signatures: commandSignatures,
+        commands_total: commands.length,
+        commands_completed: results.length,
+        completed: false,
+        passed: null,
+        updated_at: new Date().toISOString(),
+        commands: results,
+      })
     }
+    const passed = results.every((result) => !commandBlocksPass(result))
     const failureClassification = classifySmokeFailure(results)
     const hostSurfaceClassification = classifyHostSurfaceFailure(results)
     const failedCommand = results.find((result) => commandBlocksPass(result))
@@ -830,9 +980,23 @@ export default tool({
           ? "The smoke-test run failed because the smoke-test surface is not configured correctly."
           : failedCommand && failedCommandKind === "build_or_quality_gate"
             ? `The smoke-test run failed on the build or quality gate command \`${failedCommand.label}\`. Inspect the recorded command output before closeout and do not treat this as a generic test-only failure.`
-          : "The smoke-test run stopped on the first failing command. Inspect the recorded output before closeout."
+          : "The smoke-test run completed every planned command and captured all failing outputs. Inspect the recorded command results and checkpoint before closeout."
     const body = renderArtifact(ticket.id, results, passed, note)
     const artifactPath = await persistArtifact(ticket.id, body, passed)
+    const checkpointPath = await saveSmokeCheckpoint({
+      version: SMOKE_CHECKPOINT_VERSION,
+      ticket_id: ticket.id,
+      qa_artifact: latestQaArtifact.path,
+      scope: args.scope || (args.test_paths && args.test_paths.length > 0 ? "ticket" : "full-suite"),
+      test_paths: args.test_paths || [],
+      command_signatures: commandSignatures,
+      commands_total: commands.length,
+      commands_completed: results.length,
+      completed: true,
+      passed,
+      updated_at: new Date().toISOString(),
+      commands: results,
+    })
 
     return JSON.stringify(
       {
@@ -840,6 +1004,8 @@ export default tool({
         passed,
         qa_artifact: latestQaArtifact.path,
         smoke_test_artifact: artifactPath,
+        smoke_checkpoint: checkpointPath,
+        resumed_from_checkpoint: resumedFromCheckpoint,
         scope: args.scope || (args.test_paths && args.test_paths.length > 0 ? "ticket" : "full-suite"),
         test_paths: args.test_paths || [],
         failure_classification: failureClassification,

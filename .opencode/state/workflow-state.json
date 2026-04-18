@@ -1,8 +1,8 @@
 {
-  "active_ticket": "REMED-002",
-  "stage": "planning",
-  "status": "todo",
-  "approved_plan": false,
+  "active_ticket": "REMED-019",
+  "stage": "closeout",
+  "status": "done",
+  "approved_plan": true,
   "bootstrap_blockers": [],
   "ticket_state": {
     "SETUP-001": {
@@ -76,7 +76,7 @@
       "needs_reverification": false
     },
     "REMED-002": {
-      "approved_plan": false,
+      "approved_plan": true,
       "reopen_count": 0,
       "needs_reverification": false
     },
@@ -94,91 +94,116 @@
       "approved_plan": false,
       "reopen_count": 0,
       "needs_reverification": false
+    },
+    "REMED-006": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-007": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-008": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-009": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-010": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-011": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-012": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-013": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "VISUAL-001": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "FINISH-VALIDATE-001": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "AUDIO-001": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-014": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-015": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-016": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-017": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-018": {
+      "approved_plan": false,
+      "reopen_count": 0,
+      "needs_reverification": false
+    },
+    "REMED-019": {
+      "approved_plan": true,
+      "reopen_count": 0,
+      "needs_reverification": false
     }
   },
   "process_version": 7,
-  "process_last_changed_at": "2026-04-12T03:45:01.944Z",
+  "process_last_changed_at": "2026-04-17T22:49:13.374Z",
   "process_last_change_summary": "Managed Scafforge repair runner refreshed deterministic workflow surfaces and evaluated downstream repair obligations.",
-  "pending_process_verification": true,
+  "pending_process_verification": false,
   "parallel_mode": "sequential",
   "repair_follow_on": {
     "outcome": "source_follow_up",
-    "required_stages": [
-      "project-skill-bootstrap",
-      "ticket-pack-builder"
-    ],
+    "required_stages": [],
     "completed_stages": [
-      "project-skill-bootstrap",
-      "ticket-pack-builder"
+      "project-skill-bootstrap"
     ],
     "blocking_reasons": [],
-    "verification_passed": false,
+    "verification_passed": true,
     "handoff_allowed": true,
-    "last_updated_at": "2026-04-12T03:46:07Z",
-    "process_version": 7,
-    "required_stage_details": [],
-    "asserted_completed_stages": [],
-    "legacy_asserted_completed_stages": [],
-    "stage_completion_mode": "legacy_manual_assertion",
-    "tracking_mode": "persistent_recorded_state",
-    "follow_on_state_path": ".opencode/meta/repair-follow-on-state.json",
-    "recorded_stage_state": {
-      "project-skill-bootstrap": {
-        "stage": "project-skill-bootstrap",
-        "owner": "project-skill-bootstrap",
-        "category": "repo_local_skills",
-        "status": "completed",
-        "reason": "Repo-local skills still contain generic placeholder/model drift that must be regenerated with project-specific content.",
-        "currently_required": true,
-        "last_checked_at": "2026-04-12T03:46:05Z",
-        "last_updated_at": "2026-04-12T03:46:05Z",
-        "completion_mode": "recorded_execution",
-        "completed_by": "project-skill-bootstrap",
-        "summary": "Regenerated the repo-local skill pack and removed scaffold placeholder or model drift for the current repair cycle.",
-        "evidence_paths": [
-          ".opencode/state/artifacts/history/repair/project-skill-bootstrap-completion.md"
-        ],
-        "repair_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
-        "first_recorded_at": "2026-04-12T03:46:05Z",
-        "last_recorded_at": "2026-04-12T03:46:05Z"
-      },
-      "ticket-pack-builder": {
-        "stage": "ticket-pack-builder",
-        "owner": "ticket-pack-builder",
-        "category": "ticket_follow_up",
-        "status": "completed",
-        "reason": "Repair left remediation or reverification follow-up that must be routed into the repo ticket system.",
-        "currently_required": true,
-        "last_checked_at": "2026-04-12T03:46:07Z",
-        "last_updated_at": "2026-04-12T03:46:07Z",
-        "completion_mode": "recorded_execution",
-        "completed_by": "ticket-pack-builder",
-        "summary": "Created or updated the canonical repair follow-up tickets required by the current repair cycle.",
-        "evidence_paths": [
-          ".opencode/state/artifacts/history/repair/ticket-pack-builder-completion.md"
-        ],
-        "repair_package_commit": "72acfbad2d953b04f73d10fc873102b70b9e8907+dirty:46fd98a78223",
-        "first_recorded_at": "2026-04-12T03:46:07Z",
-        "last_recorded_at": "2026-04-12T03:46:07Z"
-      }
-    },
-    "pruned_unknown_stages": [],
-    "invalidated_recorded_stages": [],
-    "current_state_clean": false,
-    "causal_regression_verified": false,
-    "verification_blocking_codes": [],
-    "source_follow_up_codes": [],
-    "process_state_codes": [],
-    "advisory_codes": [],
-    "contract_failures": [],
-    "reconciled_by": "reconcile_repair_follow_on"
+    "last_updated_at": "2026-04-17T22:54:05Z",
+    "process_version": 7
   },
   "bootstrap": {
     "status": "ready",
-    "last_verified_at": "2026-04-10T04:55:58.711Z",
-    "environment_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "proof_artifact": ".opencode/state/artifacts/history/ui-001/bootstrap/2026-04-10T04-55-58-711Z-environment-bootstrap.md"
+    "last_verified_at": "2026-04-17T22:54:03.772Z",
+    "environment_fingerprint": "8ea8a00d9f3631835803e13c83017e4aa16639be5f09bf254e9b75d7dc6864eb",
+    "proof_artifact": ".opencode/state/artifacts/history/remed-013/bootstrap/2026-04-17T22-54-03-771Z-environment-bootstrap.md"
   },
   "lane_leases": [],
-  "state_revision": 215
+  "state_revision": 413
 }

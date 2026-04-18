@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-04-17T22:36:07Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 1,
+  "finding_codes": [
+    "WFLOW006"
+  ],
+  "source_findings": [],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "initial_diagnosis",
+  "evidence_mode": "transcript_backed",
+  "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:e5e914a00e59",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-17T22:36:07Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:e5e914a00e59",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 1,
+    "findings": [
+      {
+        "code": "WFLOW006",
+        "severity": "warning",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          ".opencode/agents/wvhva-team-leader.md",
+          ".opencode/agents/wvhva-backlog-verifier.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 1,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 0,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-020",
+      "title": "The team leader prompt leaves workflow mechanics underspecified enough that weaker models can thrash or search for bypasses",
+      "description": "Remediate WFLOW006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        ".opencode/agents/wvhva-team-leader.md",
+        ".opencode/agents/wvhva-backlog-verifier.md"
+      ],
+      "suggested_fix_approach": "Tell the team leader to route from `ticket_lookup.transition_guidance`, refresh canonical acceptance before reverification when the backlog verifier reports stale ticket truth, require current-cycle repair completion artifacts instead of self-asserted repair follow-on, leave stage artifacts to the owning specialist, and keep slash commands human-only.",
+      "assignee": "implementer",
+      "source_finding_code": "WFLOW006",
+      "source_finding_codes": [
+        "WFLOW006"
+      ],
+      "severity": "warning",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Tell the team leader to route from `ticket_lookup.transition_guidance`, refresh canonical acceptance before reverification when the backlog verifier reports stale ticket truth, require current-cycle repair completion artifacts instead of self-asserted repair follow-on, leave stage artifacts to the owning specialist, and keep slash commands human-only.",
+      "source_files": [
+        ".opencode/agents/wvhva-team-leader.md",
+        ".opencode/agents/wvhva-backlog-verifier.md"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_repair",
+  "supporting_logs": [
+    "/home/rowan/Scafforge/reports/agent-runs/wvhva-opencode-2026-04-17T22-20-29.log"
+  ],
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

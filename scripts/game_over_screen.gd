@@ -76,6 +76,17 @@ func _setup_ui() -> void:
 	restart_button.add_theme_font_size_override("font_size", 48)
 	restart_button.connect("pressed", Callable(self, "_on_restart_pressed"))
 	add_child(restart_button)
+	
+	# Create decorative separator line between score and button
+	var separator = ColorRect.new()
+	separator.name = "Separator"
+	separator.color = Color(1.0, 1.0, 1.0, 0.3)
+	separator.set_anchors_preset(Control.PRESET_CENTER)
+	separator.offset_left = -200
+	separator.offset_right = 200
+	separator.offset_top = 47
+	separator.offset_bottom = 51
+	add_child(separator)
 
 func _on_restart_pressed() -> void:
 	restart_pressed.emit()

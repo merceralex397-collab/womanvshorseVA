@@ -14,10 +14,10 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_last_position = global_position
-	super(delta)
+	super._physics_process(delta)
+	queue_redraw()
 
 func _draw() -> void:
-	super()
 	if velocity.length() > 50:
 		var behind_offset: Vector2 = -Vector2.from_angle(rotation) * body_size.x * 0.6
 		for i in range(3):

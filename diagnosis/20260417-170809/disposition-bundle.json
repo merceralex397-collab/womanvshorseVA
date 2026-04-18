@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-17T17:08:09Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "audit_package_commit": "b2205a14fc57390317ff7b52a5c79e7a6a29adf4+dirty:9098717018f7",
+  "allowed_classes": [
+    "managed_blocker",
+    "manual_prerequisite_blocker",
+    "source_follow_up",
+    "process_state_only",
+    "advisory"
+  ],
+  "finding_count": 2,
+  "findings": [
+    {
+      "code": "SKILL001",
+      "severity": "warning",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        ".opencode/skills/stack-standards/SKILL.md"
+      ],
+      "provenance": "script"
+    },
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error",
+      "disposition_class": "managed_blocker",
+      "legacy_disposition_class": "source_follow_up",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "evidence_grade": "repo-state validation",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/finish-validate-001/smoke-test/2026-04-17T02-39-10-710Z-smoke-test.md"
+      ],
+      "provenance": "script"
+    }
+  ],
+  "counts": {
+    "managed_blocker": 2,
+    "manual_prerequisite_blocker": 0,
+    "source_follow_up": 0,
+    "process_state_only": 0,
+    "advisory": 0
+  },
+  "shadow_mode_deltas": [
+    {
+      "code": "EXEC-GODOT-006",
+      "legacy_disposition_class": "source_follow_up",
+      "disposition_class": "managed_blocker",
+      "route": "scafforge-repair",
+      "reason": "Legacy prefix classification would label EXEC-GODOT-006 as source_follow_up, but the authoritative bundle assigns managed_blocker."
+    }
+  ]
+}

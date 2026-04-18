@@ -1,0 +1,290 @@
+{
+  "generated_at": "2026-04-15T03:17:49Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 5,
+  "finding_codes": [
+    "CONFIG010",
+    "CONFIG011",
+    "EXEC-GODOT-006",
+    "EXEC-GODOT-009",
+    "EXEC-REMED-001"
+  ],
+  "source_findings": [
+    {
+      "code": "EXEC-GODOT-009",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-GODOT-006",
+      "severity": "error"
+    },
+    {
+      "code": "EXEC-REMED-001",
+      "severity": "error"
+    }
+  ],
+  "result_state": "validated failures found",
+  "diagnosis_kind": "post_package_revalidation",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:d35d46277e67",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-15T03:17:49Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:d35d46277e67",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 5,
+    "findings": [
+      {
+        "code": "CONFIG010",
+        "severity": "warning",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "assets/briefs",
+          "assets/models",
+          "assets/sprites",
+          "assets/audio",
+          "assets/fonts",
+          "assets/themes",
+          "assets/previews",
+          "assets/workfiles",
+          "assets/licenses",
+          "assets/import-reports",
+          "assets/pipeline.json",
+          "assets/PROVENANCE.md",
+          "assets/briefs/README.md",
+          ".opencode/meta/asset-pipeline-bootstrap.json"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "CONFIG011",
+        "severity": "warning",
+        "disposition_class": "managed_blocker",
+        "legacy_disposition_class": "managed_blocker",
+        "route": "scafforge-repair",
+        "repair_class": "safe Scafforge package change",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "opencode.jsonc"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-GODOT-009",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          "scripts/hud.gd",
+          "scripts/hud.gd",
+          "scripts/wave_spawner.gd"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-GODOT-006",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "project.godot",
+          ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+        ],
+        "provenance": "script"
+      },
+      {
+        "code": "EXEC-REMED-001",
+        "severity": "error",
+        "disposition_class": "source_follow_up",
+        "legacy_disposition_class": "source_follow_up",
+        "route": "ticket-pack-builder",
+        "repair_class": "generated-repo remediation ticket",
+        "evidence_grade": "repo-state validation",
+        "source_files": [
+          "tickets/manifest.json",
+          ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+        ],
+        "provenance": "script"
+      }
+    ],
+    "counts": {
+      "managed_blocker": 2,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 3,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [
+    {
+      "id": "REMED-010",
+      "title": "Godot release smoke artifact reports PASS despite recorded runtime or command-failure evidence",
+      "description": "Remediate EXEC-GODOT-006 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ],
+      "suggested_fix_approach": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-006",
+      "source_finding_codes": [
+        "EXEC-GODOT-006"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "Make smoke_test fail when Godot export/load output contains parse or script-load errors, and reject PASS smoke artifacts whose command blocks record non-zero exit codes or non-`none` failure classifications before release closeout.",
+      "source_files": [
+        "project.godot",
+        ".opencode/state/artifacts/history/release-001/smoke-test/2026-04-10T11-36-40-894Z-smoke-test.md"
+      ]
+    },
+    {
+      "id": "REMED-011",
+      "title": "GDScript calls APIs that are unavailable on the script's declared base type",
+      "description": "Remediate EXEC-GODOT-009 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "project.godot",
+        "scripts/hud.gd",
+        "scripts/hud.gd",
+        "scripts/wave_spawner.gd"
+      ],
+      "suggested_fix_approach": "Validate GDScript method calls against the declared base type and move draw/redraw or viewport-rect logic onto compatible CanvasItem-derived nodes before treating headless load as trustworthy.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-GODOT-009",
+      "source_finding_codes": [
+        "EXEC-GODOT-009"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "Validate GDScript method calls against the declared base type and move draw/redraw or viewport-rect logic onto compatible CanvasItem-derived nodes before treating headless load as trustworthy.",
+      "source_files": [
+        "project.godot",
+        "scripts/hud.gd",
+        "scripts/hud.gd",
+        "scripts/wave_spawner.gd"
+      ]
+    },
+    {
+      "id": "REMED-002",
+      "title": "Remediation review artifact does not contain runnable command evidence",
+      "description": "Remediate EXEC-REMED-001 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ],
+      "suggested_fix_approach": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "assignee": "implementer",
+      "source_finding_code": "EXEC-REMED-001",
+      "source_finding_codes": [
+        "EXEC-REMED-001"
+      ],
+      "severity": "error",
+      "route": "ticket-pack-builder",
+      "repair_class": "generated-repo remediation ticket",
+      "summary": "For remediation tickets with `finding_source`, require the review artifact to record the exact command run, include raw command output, and state the explicit PASS/FAIL result before the review counts as trustworthy closure.",
+      "source_files": [
+        "tickets/manifest.json",
+        ".opencode/state/reviews/remed-001-review-backlog-verification.md"
+      ]
+    },
+    {
+      "id": "REMED-012",
+      "title": "A managed game repo is missing canonical asset-pipeline starter surfaces",
+      "description": "Remediate CONFIG010 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "assets/briefs",
+        "assets/models",
+        "assets/sprites",
+        "assets/audio",
+        "assets/fonts",
+        "assets/themes",
+        "assets/previews",
+        "assets/workfiles",
+        "assets/licenses",
+        "assets/import-reports",
+        "assets/pipeline.json",
+        "assets/PROVENANCE.md",
+        "assets/briefs/README.md",
+        ".opencode/meta/asset-pipeline-bootstrap.json"
+      ],
+      "suggested_fix_approach": "Backfill the rendered asset starter surfaces from the current package during managed repair and keep them aligned to the canonical finish contract.",
+      "assignee": "implementer",
+      "source_finding_code": "CONFIG010",
+      "source_finding_codes": [
+        "CONFIG010"
+      ],
+      "severity": "warning",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Backfill the rendered asset starter surfaces from the current package during managed repair and keep them aligned to the canonical finish contract.",
+      "source_files": [
+        "assets/briefs",
+        "assets/models",
+        "assets/sprites",
+        "assets/audio",
+        "assets/fonts",
+        "assets/themes",
+        "assets/previews",
+        "assets/workfiles",
+        "assets/licenses",
+        "assets/import-reports",
+        "assets/pipeline.json",
+        "assets/PROVENANCE.md",
+        "assets/briefs/README.md",
+        ".opencode/meta/asset-pipeline-bootstrap.json"
+      ]
+    },
+    {
+      "id": "REMED-013",
+      "title": "blender_agent is enabled for a repo whose current asset route does not require Blender-MCP",
+      "description": "Remediate CONFIG011 by correcting the validated issue and rerunning the relevant quality checks.",
+      "affected_files": [
+        "opencode.jsonc"
+      ],
+      "suggested_fix_approach": "Disable blender_agent for non-Blender routes even if Blender happens to be installed on the current host.",
+      "assignee": "implementer",
+      "source_finding_code": "CONFIG011",
+      "source_finding_codes": [
+        "CONFIG011"
+      ],
+      "severity": "warning",
+      "route": "scafforge-repair",
+      "repair_class": "safe Scafforge package change",
+      "summary": "Disable blender_agent for non-Blender routes even if Blender happens to be installed on the current host.",
+      "source_files": [
+        "opencode.jsonc"
+      ]
+    }
+  ],
+  "package_work_required_first": false,
+  "recommended_next_step": "subject_repo_repair",
+  "recommended_ticket_payload": "recommended-ticket-payload.json"
+}

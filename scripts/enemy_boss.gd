@@ -13,3 +13,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var t: float = sin(Time.get_ticks_msec() / 300.0) * 0.5 + 0.5
 	modulate = Color(1.0, 0.84 + t * 0.16, 0.0 + t * 1.0, 1.0)
+	# Amplified pulse: scale oscillates slightly (1.0 to 1.15) in addition to color
+	var scale_factor: float = 1.0 + t * 0.15
+	scale = Vector2(scale_factor, scale_factor)

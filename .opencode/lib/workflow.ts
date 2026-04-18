@@ -1,6 +1,8 @@
+import { existsSync, realpathSync } from "node:fs"
 import { appendFile, copyFile, mkdir, readFile, stat, writeFile } from "node:fs/promises"
-import { dirname, join, relative, resolve } from "node:path"
+import { delimiter, dirname, join, relative, resolve } from "node:path"
 import { createHash } from "node:crypto"
+import { homedir } from "node:os"
 
 export type OverlapRisk = "low" | "medium" | "high"
 export type ParallelMode = "parallel-lanes" | "sequential"
@@ -73,6 +75,7 @@ export type TicketWorkflowState = {
   approved_plan: boolean
   reopen_count: number
   needs_reverification: boolean
+  needs_acceptance_refresh?: boolean
 }
 
 export type BootstrapState = {
@@ -321,16 +324,18 @@ export async function findExistingRepoVenvExecutable(root: string, executable: s
 }
 
 const EXECUTION_EVIDENCE_PATTERNS = [
-  /```(?:bash|sh|shell|console|text)?[\s\S]*?(?:npm|pnpm|yarn|bun|pytest|cargo|go test|go vet|python(?:3)? -m|node(?:\s|$)|tsc(?:\s|$)|make(?:\s|$)|exit code|passed|failed)/i,
-  /(?:^|\n)(?:\$ |>|command: ).*(?:npm|pnpm|yarn|bun|pytest|cargo|go test|go vet|python(?:3)? -m|node|tsc|make)/i,
-  /\b(?:exit[_ -]?code|pass(?:ed)?|fail(?:ed)?|ok)\b/i,
+  /```(?:bash|sh|shell|console|text)?[\s\S]*?(?:godot(?:4)?|npm|pnpm|yarn|bun|pytest|cargo|go test|go vet|python(?:3)? -m|node(?:\s|$)|tsc(?:\s|$)|make(?:\s|$)|gradle|\.\/gradlew|adb|unzip|exit code|passed|failed)/i,
+  /(?:^|\n)(?:\$ |>|command: ).*(?:godot(?:4)?|npm|pnpm|yarn|bun|pytest|cargo|go test|go vet|python(?:3)? -m|node|tsc|make|gradle|\.\/gradlew|adb|unzip)/i,
+  /\b(?:exit(?:[_ -]?code)?|result|pass(?:ed|es)?|fail(?:ed|s)?|ok)\b/i,
 ]
 const INSPECTION_ONLY_PATTERNS = [/code inspection/i, /inspection only/i]
-const REMEDIATION_REVIEW_COMMAND_PATTERN = /(?:^|\n)(?:-\s*)?(?:(?:\*\*|__)?(?:command|command run|verbatim commands?)?(?:\*\*|__)?\s*:|(?:\*\*|__)?(?:command|command run|verbatim commands?)(?:\*\*|__)?)\s*(?:`[^`]+`|```[\s\S]*?```)?/i
+const REMEDIATION_REVIEW_COMMAND_PATTERN = /(?:^|\n)(?:-\s*)?(?:(?:\*\*|__)?(?:exact\s+command\s+run|command|command run|verbatim commands?)?(?:\*\*|__)?\s*:|(?:\*\*|__)?(?:exact\s+command\s+run|command|command run|verbatim commands?)(?:\*\*|__)?)\s*(?:`[^`]+`|```[\s\S]*?```)?/i
 const REMEDIATION_REVIEW_COMMAND_BLOCK_PATTERN = /```(?:bash|sh|shell|console|text)?\n[\s\S]*?(?:godot(?:4)?|npm|pnpm|yarn|bun|pytest|cargo|go test|go vet|python(?:3)? -m|node(?:\s|$)|tsc(?:\s|$)|make(?:\s|$)|gradle|\.\/gradlew|adb|unzip)\b[\s\S]*?```/i
+const REMEDIATION_REVIEW_COMMAND_HEADING_PATTERN = /(?:^|\n)#{1,6}\s*command(?:\s+\d+)?(?:\s*[—:-].*)?$/im
 const REMEDIATION_REVIEW_COMMAND_SUMMARY_TABLE_PATTERN = /^\|\s*#\s*\|\s*Command\s*\|\s*Exit Code\s*\|\s*Result\s*\|/im
 const REMEDIATION_REVIEW_OUTPUT_HEADING_PATTERN = /(?:raw(?:\s+command)?\s+output|raw\s+output|command\s+output|raw\s+stdout|raw\s+stderr|stdout|stderr)(?:\s*\([^)]*\))?/i
-const REMEDIATION_REVIEW_RESULT_PATTERN = /(?:^|\n)(?:-\s*)?(?:(?:\*\*|__)?(?:overall\s+result|overall\s+verdict|verdict|result|post-fix\s+result|pass\/fail\s+result)(?:\*\*|__)?\s*:|(?:\*\*|__)?(?:overall\s+result|overall\s+verdict|verdict|result|post-fix\s+result|pass\/fail\s+result):(?:\*\*|__)?)\s*(?:\*\*|__|`)?(?:PASS|PASSES|FAIL|FAILED|BLOCKED|ERROR|APPROVED|REJECT)(?:\*\*|__|`)?/i
+const REMEDIATION_REVIEW_INLINE_OUTPUT_PATTERN = /(?:^|\n)(?:-\s*)?(?:(?:\*\*|__)?(?:raw(?:\s+command)?\s+output|raw\s+output|command\s+output|raw\s+stdout|raw\s+stderr|stdout|stderr)(?:\s*\([^)]*\))?(?:\*\*|__)?\s*:|(?:\*\*|__)?(?:raw(?:\s+command)?\s+output|raw\s+output|command\s+output|raw\s+stdout|raw\s+stderr|stdout|stderr)(?:\s*\([^)]*\))?(?:\*\*|__)?:)/i
+const REMEDIATION_REVIEW_RESULT_PATTERN = /(?:(?:^|\n)(?:-\s*)?(?:(?:\*\*|__)?(?:overall\s+result|overall\s+verdict|verdict|result|post-fix\s+result|pass\/fail\s+result)(?:\*\*|__)?\s*:|(?:\*\*|__)?(?:overall\s+result|overall\s+verdict|verdict|result|post-fix\s+result|pass\/fail\s+result):(?:\*\*|__)?)\s*(?:\*\*|__|`|[✅❌✔✖]\s*)*(?:PASS|PASSES|FAIL|FAILED|BLOCKED|ERROR|APPROVED|REJECT)(?:\*\*|__|`)?|(?:^|\n)#{1,6}\s*(?:overall\s+result|overall\s+verdict|review\s+verdict|verdict|result|post-fix\s+result|pass\/fail\s+result|blocker\s+or\s+approval\s+signal)\s*(?:\r?\n\s*)+(?:\*\*|__|`|[✅❌✔✖]\s*)*(?:PASS|PASSES|FAIL|FAILED|BLOCKED|ERROR|APPROVED|REJECT)(?:\*\*|__|`)?)/i
 const CODE_BLOCK_PATTERN = /```(?:[^\n]*)\n([\s\S]*?)```/g
 
 export function rootPath(): string { return process.cwd() }
@@ -473,6 +478,31 @@ async function readText(path: string, fallback = ""): Promise<string> { try { re
 export async function writeJson(path: string, value: unknown): Promise<void> { await mkdir(dirname(path), { recursive: true }); await writeFile(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8") }
 export async function appendJsonl(path: string, value: unknown): Promise<void> { await mkdir(dirname(path), { recursive: true }); await appendFile(path, `${JSON.stringify(value)}\n`, "utf-8") }
 export async function writeText(path: string, value: string): Promise<void> { await mkdir(dirname(path), { recursive: true }); await writeFile(path, value, "utf-8") }
+export async function resolveAgentNameFromSession(sessionID?: string | null, root = rootPath()): Promise<string | null> {
+  const normalizedSessionId = typeof sessionID === "string" ? sessionID.trim() : ""
+  if (!normalizedSessionId) {
+    return null
+  }
+  const rawLog = await readText(invocationLogPath(root))
+  if (!rawLog.trim()) {
+    return null
+  }
+  const lines = rawLog.split(/\r?\n/).filter(Boolean)
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const line = lines[index]
+    if (!line) continue
+    try {
+      const parsed = JSON.parse(line) as { session_id?: unknown, agent?: unknown }
+      if (parsed.session_id !== normalizedSessionId) continue
+      if (typeof parsed.agent === "string" && parsed.agent.trim()) {
+        return parsed.agent.trim()
+      }
+    } catch {
+      continue
+    }
+  }
+  return null
+}
 // Canonical bootstrap-first examples:
 // - tickets/manifest.json not found. Run bootstrap first.
 // - .opencode/state/workflow-state.json not found. Run bootstrap first.
@@ -530,6 +560,7 @@ function normalizeTicketWorkflowState(value: unknown): TicketWorkflowState {
     approved_plan: typeof state.approved_plan === "boolean" ? state.approved_plan : false,
     reopen_count: typeof state.reopen_count === "number" && state.reopen_count >= 0 ? Math.floor(state.reopen_count) : 0,
     needs_reverification: typeof state.needs_reverification === "boolean" ? state.needs_reverification : false,
+    needs_acceptance_refresh: state.needs_acceptance_refresh === true ? true : undefined,
   }
 }
 function normalizeTicketStateMap(value: unknown): Record<string, TicketWorkflowState> {
@@ -855,9 +886,18 @@ export function getTicket(manifest: Manifest, ticketId?: string): Ticket {
 export function isPlanApprovedForTicket(workflow: WorkflowState, ticketId: string): boolean { return ensureTicketWorkflowState(workflow, ticketId).approved_plan }
 export function setPlanApprovedForTicket(workflow: WorkflowState, ticketId: string, approved: boolean): void { ensureTicketWorkflowState(workflow, ticketId).approved_plan = approved }
 export function getTicketWorkflowState(workflow: WorkflowState, ticketId: string): TicketWorkflowState { return ensureTicketWorkflowState(workflow, ticketId) }
-export function selectForegroundTicket(manifest: Manifest, workflow: WorkflowState, currentTicketId = manifest.active_ticket): Ticket {
+export function ticketNeedsAcceptanceRefresh(workflow: WorkflowState, ticketId: string): boolean {
+  return ensureTicketWorkflowState(workflow, ticketId).needs_acceptance_refresh === true
+}
+export function selectForegroundTicket(manifest: Manifest, workflow?: WorkflowState, currentTicketId = manifest.active_ticket): Ticket {
   const currentTicket = manifest.tickets.find((item) => item.id === currentTicketId)
   if (currentTicket && currentTicket.status !== "done") return currentTicket
+  if (workflow?.pending_process_verification) {
+    const affectedDoneTickets = ticketsNeedingProcessVerification(manifest, workflow)
+    if (currentTicket && affectedDoneTickets.some((item) => item.id === currentTicket.id)) return currentTicket
+    const nextAffectedDoneTicket = affectedDoneTickets[0]
+    if (nextAffectedDoneTicket) return nextAffectedDoneTicket
+  }
   const nextOpenTicket = nextTicketForProcessVerificationClear(manifest, currentTicketId)
   if (nextOpenTicket) return nextOpenTicket
   if (currentTicket) return currentTicket
@@ -1034,6 +1074,10 @@ export function validateRestartSurfacePublication(manifest: Manifest, workflow: 
   if (workflow.stage !== activeTicket.stage || workflow.status !== activeTicket.status) {
     return `Restart surfaces can only publish from the verified post-mutation snapshot for ${activeTicket.id}.`
   }
+  const acceptanceRefreshTickets = manifest.tickets.filter((ticket) => ticketNeedsAcceptanceRefresh(workflow, ticket.id))
+  if (acceptanceRefreshTickets.length > 0) {
+    return `Restart surfaces can only publish after canonical acceptance refresh is complete for ${acceptanceRefreshTickets.map((ticket) => ticket.id).join(", ")}.`
+  }
   return null
 }
 
@@ -1041,10 +1085,40 @@ type ArtifactMatcher = { kind?: string; stage?: string; trust_state?: ArtifactTr
 type ArtifactRegistrationSpec = { ticket: Ticket; registry: ArtifactRegistry; source_path: string; kind: string; stage: string; summary?: string }
 
 const BOOTSTRAP_INPUT_FILES = [
+  "project.godot", "export_presets.cfg", "opencode.jsonc",
   "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb",
   "pyproject.toml", "requirements.txt", "requirements-dev.txt", "poetry.lock", "Pipfile", "Pipfile.lock", "uv.lock",
   "Cargo.toml", "Cargo.lock", "go.mod", "go.sum", "Makefile", "pytest.ini", "setup.py", "setup.cfg",
+  "android/scafforge-managed.json",
+  ".opencode/meta/asset-pipeline-bootstrap.json",
 ]
+const BOOTSTRAP_ENVIRONMENT_KEYS = [
+  "JAVA_HOME",
+  "ANDROID_HOME",
+  "ANDROID_SDK_ROOT",
+  "BLENDER_MCP_BLENDER_EXECUTABLE",
+] as const
+const BOOTSTRAP_HOST_PATH_CANDIDATES = {
+  android_debug_keystore: [join(homedir(), ".android", "debug.keystore")],
+  godot_export_templates: [join(homedir(), ".local", "share", "godot", "export_templates")],
+  android_sdk_default: [
+    join(homedir(), "Android", "Sdk"),
+    join(homedir(), "Library", "Android", "sdk"),
+    join(homedir(), "AppData", "Local", "Android", "Sdk"),
+  ],
+  java_home_default: [
+    join("/usr", "lib", "jvm", "default-java"),
+    join("/usr", "lib", "jvm", "java-21-openjdk-amd64"),
+    join("/usr", "lib", "jvm", "java-17-openjdk-amd64"),
+    join("/usr", "lib", "jvm", "java-11-openjdk-amd64"),
+  ],
+} as const
+type BootstrapFingerprintInputs = {
+  input_files: string[]
+  repo_surfaces: Record<string, boolean>
+  env: Record<string, string>
+  host_paths: Record<string, string>
+}
 
 function matchesArtifact(artifact: Artifact, options: ArtifactMatcher): boolean {
   if (options.kind && artifact.kind !== options.kind) return false
@@ -1064,7 +1138,11 @@ export function historicalArtifacts(ticket: Ticket, options: Omit<ArtifactMatche
 }
 export function currentRegistryArtifact(registry: ArtifactRegistry, artifactPath: string): ArtifactRegistryEntry | undefined {
   const normalized = normalizeRepoPath(artifactPath)
-  return [...registry.artifacts].reverse().find((artifact) => artifact.path === normalized && artifact.trust_state === "current")
+  return [...registry.artifacts].reverse().find(
+    (artifact) =>
+      artifact.trust_state === "current"
+      && (artifact.path === normalized || artifact.source_path === normalized),
+  )
 }
 export function currentStageArtifactForAlias(ticket: Ticket, stage: string, kind: string, artifactPath: string): Artifact | undefined {
   const normalized = normalizeRepoPath(artifactPath)
@@ -1080,7 +1158,7 @@ export function hasArtifact(ticket: Ticket, options: ArtifactMatcher): boolean {
   return latestArtifact(ticket, { ...options, trust_state: options.trust_state ?? "current" }) !== undefined
 }
 export function latestReviewArtifact(ticket: Ticket): Artifact | undefined {
-  return latestArtifact(ticket, { stage: "review", trust_state: "current" }) || [...LEGACY_REVIEW_STAGES].map((stage) => latestArtifact(ticket, { stage, trust_state: "current" })).find(Boolean)
+  return latestArtifact(ticket, { stage: "review", kind: "review", trust_state: "current" }) || [...LEGACY_REVIEW_STAGES].map((stage) => latestArtifact(ticket, { stage, kind: "review", trust_state: "current" })).find(Boolean)
 }
 export function hasReviewArtifact(ticket: Ticket): boolean { return latestReviewArtifact(ticket) !== undefined }
 export async function readArtifactContent(artifact: Artifact | undefined, root = rootPath()): Promise<string> {
@@ -1095,14 +1173,28 @@ function normalizeArtifactVerdictToken(token: string): ArtifactVerdict | null {
   if (normalized === "BLOCKED" || normalized === "BLOCKER") return "BLOCKED"
   return null
 }
+export function isRemediationTicket(ticket: Pick<Ticket, "id" | "lane">): boolean {
+  return ticket.lane.trim().toLowerCase() === "remediation" || ticket.id.trim().toUpperCase().startsWith("REMED-")
+}
+const BLOCKING_SMOKE_EXPECTATION_PATTERNS = [
+  /\bsmoke[_ -]?test\b.*\bfail(?:s|ing)?\b/i,
+  /\bfail(?:s|ing)?\b.*\bsmoke[_ -]?test\b/i,
+]
+export function ticketExpectsBlockingSmokeResult(ticket: Pick<Ticket, "acceptance">): boolean {
+  return Array.isArray(ticket.acceptance)
+    && ticket.acceptance.some(
+      (item) => typeof item === "string" && BLOCKING_SMOKE_EXPECTATION_PATTERNS.some((pattern) => pattern.test(item)),
+    )
+}
 const ARTIFACT_VERDICT_LABEL_PATTERN =
-  "(?:overall(?:\\s+qa)?\\s+(?:result|verdict)|qa\\s+verdict|review\\s+verdict|blocker\\s+or\\s+approval\\s+signal|approval\\s+signal|verdict|result)"
+  "(?:overall(?:\\s+qa)?(?:\\s+(?:result|verdict))?|qa\\s+(?:result|verdict)|review\\s+(?:result|verdict)|blocker\\s+or\\s+approval\\s+signal|approval\\s+signal|decision|verdict|result)"
 export function extractArtifactVerdict(content: string): ArtifactVerdictInspection {
   const lines = content.split(/\r?\n/)
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim()
-    if (!trimmed) continue
-    const plain = trimmed.replace(/(?:\*\*|__|`)/g, "")
+  const explicitChecks = (
+    trimmed: string,
+    plain: string,
+    index: number,
+  ): ArtifactVerdictInspection | null => {
     const labeled = plain.match(
       new RegExp(
         `^(?:[-*]\\s*)?${ARTIFACT_VERDICT_LABEL_PATTERN}\\s*:\\s*(pass|fail|reject|approved?|blocked?|blocker)\\b`,
@@ -1124,6 +1216,13 @@ export function extractArtifactVerdict(content: string): ArtifactVerdictInspecti
       const verdict = normalizeArtifactVerdictToken(headingInline[1] || "")
       if (verdict) return { verdict, verdict_unclear: false, matched_line: trimmed }
     }
+    const compactStageHeading = plain.match(
+      /^(?:#{1,4}\s+)?(?:(?:qa|review))\s+(pass|fail|reject|approved?|blocked?|blocker)\b/i,
+    )
+    if (compactStageHeading) {
+      const verdict = normalizeArtifactVerdictToken(compactStageHeading[1] || "")
+      if (verdict) return { verdict, verdict_unclear: false, matched_line: trimmed }
+    }
     // Heading-style verdict: ## Verdict / ### **APPROVE** on next non-empty line
     const headingLabel = plain.match(
       new RegExp(
@@ -1132,7 +1231,7 @@ export function extractArtifactVerdict(content: string): ArtifactVerdictInspecti
       ),
     )
     if (headingLabel) {
-      for (let j = i + 1; j < lines.length; j++) {
+      for (let j = index + 1; j < lines.length; j++) {
         const nextTrimmed = lines[j].trim()
         if (!nextTrimmed) continue
         const nextPlain = nextTrimmed.replace(/(?:\*\*|__|`)/g, "")
@@ -1146,6 +1245,18 @@ export function extractArtifactVerdict(content: string): ArtifactVerdictInspecti
         break
       }
     }
+    return null
+  }
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim()
+    if (!trimmed) continue
+    const plain = trimmed.replace(/(?:\*\*|__|`)/g, "")
+    const explicitVerdict = explicitChecks(trimmed, plain, i)
+    if (explicitVerdict) return explicitVerdict
+  }
+  for (const rawLine of lines) {
+    const trimmed = rawLine.trim()
+    if (!trimmed) continue
     const failureEmoji = trimmed.match(/[❌✖]\s*(?:[^A-Za-z]*)(pass|fail|reject|approved?|blocked?|blocker)\b/i)
     if (failureEmoji) {
       const verdict = normalizeArtifactVerdictToken(failureEmoji[1] || "")
@@ -1172,7 +1283,8 @@ const SMOKE_PASS_RESULT_PATTERN = /Overall Result:\s*PASS\b/i
 const SMOKE_FAILURE_CLASSIFICATION_PATTERN = /^- failure_classification:\s*([a-z_]+)\s*$/gim
 const SMOKE_EXIT_CODE_PATTERN = /^- exit_code:\s*(-?\d+)\s*$/gim
 const SMOKE_GODOT_ERROR_PATTERN = /(?:SCRIPT ERROR:\s*)?Parse Error:|ERROR:\s*Failed to load script|syntax error|parse error|failed to load script|not declared in the current scope|not found in base self|unexpected token|missing language argument|unterminated|unmatched quote/i
-const SMOKE_PASS_SAFE_FAILURE_CLASSIFICATIONS = new Set(["none", "null", "undefined", "n/a"])
+const SMOKE_PASS_SAFE_FAILURE_CLASSIFICATIONS = new Set(["none", "null", "undefined", "n/a", "tooling_parse_warning"])
+const SMOKE_GODOT_CLASSNAME_RELOAD_WARNING_PATTERN = /Could not parse global class|Could not resolve class|GDScript::reload/i
 export function smokeArtifactPassContradictionReason(content: string): string | null {
   const hasPassingVerdict = isPassingArtifactVerdict(extractArtifactVerdict(content).verdict) || SMOKE_PASS_RESULT_PATTERN.test(content)
   if (!hasPassingVerdict) return null
@@ -1188,6 +1300,12 @@ export function smokeArtifactPassContradictionReason(content: string): string | 
       return `command block records non-zero exit_code ${exitCode}`
     }
   }
+  if (
+    /failure_classification:\s*tooling_parse_warning/i.test(content)
+    && SMOKE_GODOT_CLASSNAME_RELOAD_WARNING_PATTERN.test(content)
+  ) {
+    return null
+  }
   const contradictionLine = content.split(/\r?\n/).find((line) => SMOKE_GODOT_ERROR_PATTERN.test(line))
   return contradictionLine ? `command output records ${contradictionLine.trim()}` : null
 }
@@ -1196,29 +1314,33 @@ function hasExecutionEvidence(content: string): boolean { return EXECUTION_EVIDE
 function claimsInspectionOnly(content: string): boolean { return INSPECTION_ONLY_PATTERNS.some((pattern) => pattern.test(content)) }
 function remediationReviewMissingEvidence(content: string): string[] {
   const missing: string[] = []
+  const outputBlocks = [...content.matchAll(CODE_BLOCK_PATTERN)].map((match) => (match[1] || "").trim())
+  const hasCombinedCommandOutputBlock = outputBlocks.some((block) => /^\s*\$ \S+/m.test(block) && block.split(/\r?\n/).some((line, index) => index > 0 && line.trim().length > 0))
   const hasCommandRecord = (
     REMEDIATION_REVIEW_COMMAND_PATTERN.test(content) ||
     REMEDIATION_REVIEW_COMMAND_BLOCK_PATTERN.test(content) ||
+    REMEDIATION_REVIEW_COMMAND_HEADING_PATTERN.test(content) ||
+    hasCombinedCommandOutputBlock ||
     REMEDIATION_REVIEW_COMMAND_SUMMARY_TABLE_PATTERN.test(content)
   )
   if (!hasCommandRecord) missing.push("exact command record")
-  const outputBlocks = [...content.matchAll(CODE_BLOCK_PATTERN)].map((match) => (match[1] || "").trim())
-  const hasInlineOutput = /(?:raw\s+stdout|raw\s+stderr|stdout|stderr)\s*:/i.test(content)
-  const hasOutput = REMEDIATION_REVIEW_OUTPUT_HEADING_PATTERN.test(content) && (outputBlocks.some(Boolean) || hasInlineOutput)
+  const hasInlineOutput = REMEDIATION_REVIEW_INLINE_OUTPUT_PATTERN.test(content)
+  const hasOutput = (REMEDIATION_REVIEW_OUTPUT_HEADING_PATTERN.test(content) && (outputBlocks.some(Boolean) || hasInlineOutput)) || hasCombinedCommandOutputBlock
   if (!hasOutput) missing.push("raw command output")
-  if (!REMEDIATION_REVIEW_RESULT_PATTERN.test(content)) missing.push("explicit PASS/FAIL result")
+  const verdictInfo = extractArtifactVerdict(content)
+  if (!verdictInfo.verdict && !REMEDIATION_REVIEW_RESULT_PATTERN.test(content)) missing.push("explicit PASS/FAIL result")
   return missing
 }
 export async function validateImplementationArtifactEvidence(ticket: Ticket, root = rootPath()): Promise<string | null> {
   const artifact = latestArtifact(ticket, { stage: "implementation", trust_state: "current" })
   if (!artifact) return "Cannot move to review before an implementation artifact exists."
   const content = await readArtifactContent(artifact, root)
-  return hasExecutionEvidence(content) ? null : "Implementation artifact must include compile, syntax, or import-check command output before review."
+  return hasExecutionEvidence(content) ? null : "Implementation artifact must include concrete command output (for example compile, syntax, import-check, headless, or export proof) before review."
 }
 export async function validateReviewArtifactEvidence(ticket: Ticket, root = rootPath()): Promise<string | null> {
   const artifact = latestReviewArtifact(ticket)
   if (!artifact) return "Cannot move to qa before at least one review artifact exists."
-  if (!ticket.finding_source?.trim()) return null
+  if (!ticket.finding_source?.trim() || !isRemediationTicket(ticket)) return null
   const content = await readArtifactContent(artifact, root)
   const missing = remediationReviewMissingEvidence(content)
   return missing.length
@@ -1241,7 +1363,13 @@ export async function validateSmokeTestArtifactEvidence(ticket: Ticket, root = r
   if (!hasExecutionEvidence(content)) return "Smoke-test artifact must include raw command output before closeout."
   const contradiction = smokeArtifactPassContradictionReason(content)
   if (contradiction) return `Smoke-test artifact contradicts its PASS result: ${contradiction}.`
-  return isPassingArtifactVerdict(extractArtifactVerdict(content).verdict) || SMOKE_PASS_RESULT_PATTERN.test(content)
+  const verdict = extractArtifactVerdict(content).verdict
+  if (ticketExpectsBlockingSmokeResult(ticket)) {
+    return isBlockingArtifactVerdict(verdict)
+      ? null
+      : "Smoke-test artifact must record an explicit FAIL, REJECT, or BLOCKED result before closeout because this ticket's acceptance requires blocking smoke-test proof."
+  }
+  return isPassingArtifactVerdict(verdict) || SMOKE_PASS_RESULT_PATTERN.test(content)
     ? null
     : "Smoke-test artifact must record an explicit PASS result before closeout."
 }
@@ -1287,12 +1415,26 @@ export function openParallelSplitChildren(manifest: Manifest, ticketId: string):
 
 // Ordered list of lifecycle stages used for stale-stage comparison.
 const ORDERED_LIFECYCLE_STAGES = ["planning", "plan_review", "implementation", "review", "qa", "smoke-test", "closeout"] as const
+const STALE_STAGE_ARTIFACT_PREREQUISITES: Partial<Record<typeof ORDERED_LIFECYCLE_STAGES[number], typeof ORDERED_LIFECYCLE_STAGES[number]>> = {
+  review: "implementation",
+  qa: "review",
+  "smoke-test": "qa",
+  closeout: "smoke-test",
+}
 
 export type StaleStageReconciliation = {
   stale: boolean
   manifest_stage: string
   evidenced_stage: string | null
   recovery_action: string | null
+}
+
+function artifactCanEvidenceStage(ticket: Ticket, candidateStage: typeof ORDERED_LIFECYCLE_STAGES[number]): boolean {
+  const artifact = latestArtifact(ticket, { stage: candidateStage, trust_state: "current" })
+  if (!artifact) return false
+  const prerequisite = STALE_STAGE_ARTIFACT_PREREQUISITES[candidateStage]
+  if (!prerequisite) return true
+  return artifactCanEvidenceStage(ticket, prerequisite)
 }
 
 /**
@@ -1310,8 +1452,7 @@ export function reconcileStaleStageIfNeeded(ticket: Ticket): StaleStageReconcili
   let highestEvidencedStage: string | null = null
   for (let i = ORDERED_LIFECYCLE_STAGES.length - 1; i >= 0; i--) {
     const candidateStage = ORDERED_LIFECYCLE_STAGES[i]
-    const artifact = latestArtifact(ticket, { stage: candidateStage, trust_state: "current" })
-    if (artifact) {
+    if (artifactCanEvidenceStage(ticket, candidateStage)) {
       highestEvidencedStage = candidateStage
       break
     }
@@ -1393,9 +1534,74 @@ export async function listBootstrapInputs(root = rootPath()): Promise<string[]> 
   }
   return hits.sort()
 }
+function describeBootstrapHostPaths(): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const [label, candidates] of Object.entries(BOOTSTRAP_HOST_PATH_CANDIDATES)) {
+    const existing = candidates.find((candidate) => existsSync(candidate))
+    result[label] = existing ?? "<missing>"
+  }
+  result.java_home_inferred = discoverBootstrapJavaHome() ?? "<missing>"
+  return result
+}
+function discoverBootstrapAndroidSdkPath(): string | null {
+  const explicit = normalizeNullableString(process.env.ANDROID_HOME) ?? normalizeNullableString(process.env.ANDROID_SDK_ROOT)
+  if (explicit && existsSync(explicit)) return explicit
+  for (const candidate of BOOTSTRAP_HOST_PATH_CANDIDATES.android_sdk_default) {
+    if (existsSync(candidate)) return candidate
+  }
+  return null
+}
+function discoverBootstrapJavaHome(): string | null {
+  const explicit = normalizeNullableString(process.env.JAVA_HOME)
+  if (explicit && existsSync(explicit)) return explicit
+  const pathValue = normalizeNullableString(process.env.PATH)
+  if (pathValue) {
+    const executableName = process.platform === "win32" ? "java.exe" : "java"
+    for (const segment of pathValue.split(delimiter)) {
+      const trimmed = segment.trim()
+      if (!trimmed) continue
+      const candidate = join(trimmed, executableName)
+      if (!existsSync(candidate)) continue
+      try {
+        const resolved = realpathSync(candidate)
+        const javaHome = dirname(dirname(resolved))
+        if (existsSync(join(javaHome, "bin"))) return javaHome
+      } catch {
+        continue
+      }
+    }
+  }
+  const fallback = BOOTSTRAP_HOST_PATH_CANDIDATES.java_home_default.find((candidate) => existsSync(candidate))
+  return fallback ?? null
+}
+function normalizeBootstrapEnvironmentValue(key: typeof BOOTSTRAP_ENVIRONMENT_KEYS[number]): string {
+  if (key === "JAVA_HOME") return discoverBootstrapJavaHome() ?? "<unset>"
+  if (key === "ANDROID_HOME" || key === "ANDROID_SDK_ROOT") return discoverBootstrapAndroidSdkPath() ?? "<unset>"
+  return normalizeNullableString(process.env[key]) ?? "<unset>"
+}
+export async function describeBootstrapFingerprintInputs(root = rootPath()): Promise<BootstrapFingerprintInputs> {
+  const input_files = await listBootstrapInputs(root)
+  return {
+    input_files,
+    repo_surfaces: {
+      project_godot: existsSync(join(root, "project.godot")),
+      export_presets: existsSync(join(root, "export_presets.cfg")),
+      android_support_surface: existsSync(join(root, "android", "scafforge-managed.json")),
+      asset_pipeline_metadata: existsSync(join(root, ".opencode", "meta", "asset-pipeline-bootstrap.json")),
+      opencode_config: existsSync(join(root, "opencode.jsonc")),
+    },
+    env: Object.fromEntries(
+      BOOTSTRAP_ENVIRONMENT_KEYS.map((key) => [key, normalizeBootstrapEnvironmentValue(key)]),
+    ),
+    host_paths: describeBootstrapHostPaths(),
+  }
+}
 export async function computeBootstrapFingerprint(root = rootPath()): Promise<string> {
   const hash = createHash("sha256")
-  for (const relative of await listBootstrapInputs(root)) {
+  const fingerprintInputs = await describeBootstrapFingerprintInputs(root)
+  hash.update(JSON.stringify(fingerprintInputs))
+  hash.update("\u0000")
+  for (const relative of fingerprintInputs.input_files) {
     hash.update(relative)
     hash.update("\u0000")
     hash.update(await readFile(join(root, relative)).catch(() => Buffer.from("")))
@@ -1847,7 +2053,7 @@ export function renderContextSnapshot(manifest: Manifest, workflow: WorkflowStat
   const pivotInputs = pivot.restart_surface_inputs
   const pivotState = pivot.downstream_refresh_state
   const noteBlock = note ? `\n## Note\n\n${note}\n` : ""
-  return `# Context Snapshot\n\n## Project\n\n${manifest.project}\n\n## Active Ticket\n\n- ID: ${ticket.id}\n- Title: ${ticket.title}\n- Stage: ${ticket.stage}\n- Status: ${ticket.status}\n- Resolution: ${ticket.resolution_state}\n- Verification: ${ticket.verification_state}\n- Approved plan: ${workflow.approved_plan ? "yes" : "no"}\n- Needs reverification: ${ticketState.needs_reverification ? "yes" : "no"}\n- Open split children: ${splitChildren.length > 0 ? splitChildren.map((item) => item.id).join(", ") : "none"}\n\n## Bootstrap\n\n- status: ${workflow.bootstrap.status}\n- last_verified_at: ${workflow.bootstrap.last_verified_at || "Not yet verified."}\n- proof_artifact: ${workflow.bootstrap.proof_artifact || "None"}\n- blockers: ${workflow.bootstrap_blockers.length > 0 ? workflow.bootstrap_blockers.map((item) => `${item.executable} (${item.reason})`).join(", ") : "none"}\n\n## Process State\n\n- process_version: ${workflow.process_version}\n- pending_process_verification: ${workflow.pending_process_verification ? "true" : "false"}\n- parallel_mode: ${workflow.parallel_mode}\n- state_revision: ${workflow.state_revision}\n\n## Repair Follow-On\n\n- outcome: ${workflow.repair_follow_on.outcome}\n- required: ${hasPendingRepairFollowOn(workflow) ? "yes" : "no"}\n- next_required_stage: ${repairNextStage}\n- verification_passed: ${workflow.repair_follow_on.verification_passed ? "true" : "false"}\n- last_updated_at: ${workflow.repair_follow_on.last_updated_at || "Not yet recorded."}\n\n## Pivot State\n\n- pivot_in_progress: ${pivotInputs.pivot_in_progress ? "true" : "false"}\n- pivot_class: ${pivotInputs.pivot_class || "none"}\n- pivot_changed_surfaces: ${pivotInputs.pivot_changed_surfaces.length > 0 ? pivotInputs.pivot_changed_surfaces.join(", ") : "none"}\n- pending_downstream_stages: ${pivotInputs.pending_downstream_stages.length > 0 ? pivotInputs.pending_downstream_stages.join(", ") : "none"}\n- completed_downstream_stages: ${pivotInputs.completed_downstream_stages.length > 0 ? pivotInputs.completed_downstream_stages.join(", ") : "none"}\n- pending_ticket_lineage_actions: ${pivotInputs.pending_ticket_lineage_actions.length > 0 ? pivotInputs.pending_ticket_lineage_actions.join(", ") : "none"}\n- completed_ticket_lineage_actions: ${pivotInputs.completed_ticket_lineage_actions.length > 0 ? pivotInputs.completed_ticket_lineage_actions.join(", ") : "none"}\n- post_pivot_verification_passed: ${pivotInputs.post_pivot_verification_passed ? "true" : "false"}\n- pivot_state_path: ${pivot.pivot_state_path || ".opencode/meta/pivot-state.json"}\n- pivot_tracking_mode: ${pivotState?.tracking_mode || "none"}\n\n## Lane Leases\n\n${leases}\n\n## Recent Artifacts\n\n${artifactLines}${noteBlock}`
+  return `# Context Snapshot\n\n## Project\n\n${manifest.project}\n\n## Active Ticket\n\n- ID: ${ticket.id}\n- Title: ${ticket.title}\n- Stage: ${ticket.stage}\n- Status: ${ticket.status}\n- Resolution: ${ticket.resolution_state}\n- Verification: ${ticket.verification_state}\n- Approved plan: ${workflow.approved_plan ? "yes" : "no"}\n- Needs reverification: ${ticketState.needs_reverification ? "yes" : "no"}\n- Needs acceptance refresh: ${ticketState.needs_acceptance_refresh ? "yes" : "no"}\n- Open split children: ${splitChildren.length > 0 ? splitChildren.map((item) => item.id).join(", ") : "none"}\n\n## Bootstrap\n\n- status: ${workflow.bootstrap.status}\n- last_verified_at: ${workflow.bootstrap.last_verified_at || "Not yet verified."}\n- proof_artifact: ${workflow.bootstrap.proof_artifact || "None"}\n- blockers: ${workflow.bootstrap_blockers.length > 0 ? workflow.bootstrap_blockers.map((item) => `${item.executable} (${item.reason})`).join(", ") : "none"}\n\n## Process State\n\n- process_version: ${workflow.process_version}\n- pending_process_verification: ${workflow.pending_process_verification ? "true" : "false"}\n- parallel_mode: ${workflow.parallel_mode}\n- state_revision: ${workflow.state_revision}\n\n## Repair Follow-On\n\n- outcome: ${workflow.repair_follow_on.outcome}\n- required: ${hasPendingRepairFollowOn(workflow) ? "yes" : "no"}\n- next_required_stage: ${repairNextStage}\n- verification_passed: ${workflow.repair_follow_on.verification_passed ? "true" : "false"}\n- last_updated_at: ${workflow.repair_follow_on.last_updated_at || "Not yet recorded."}\n\n## Pivot State\n\n- pivot_in_progress: ${pivotInputs.pivot_in_progress ? "true" : "false"}\n- pivot_class: ${pivotInputs.pivot_class || "none"}\n- pivot_changed_surfaces: ${pivotInputs.pivot_changed_surfaces.length > 0 ? pivotInputs.pivot_changed_surfaces.join(", ") : "none"}\n- pending_downstream_stages: ${pivotInputs.pending_downstream_stages.length > 0 ? pivotInputs.pending_downstream_stages.join(", ") : "none"}\n- completed_downstream_stages: ${pivotInputs.completed_downstream_stages.length > 0 ? pivotInputs.completed_downstream_stages.join(", ") : "none"}\n- pending_ticket_lineage_actions: ${pivotInputs.pending_ticket_lineage_actions.length > 0 ? pivotInputs.pending_ticket_lineage_actions.join(", ") : "none"}\n- completed_ticket_lineage_actions: ${pivotInputs.completed_ticket_lineage_actions.length > 0 ? pivotInputs.completed_ticket_lineage_actions.join(", ") : "none"}\n- post_pivot_verification_passed: ${pivotInputs.post_pivot_verification_passed ? "true" : "false"}\n- pivot_state_path: ${pivot.pivot_state_path || ".opencode/meta/pivot-state.json"}\n- pivot_tracking_mode: ${pivotState?.tracking_mode || "none"}\n\n## Lane Leases\n\n${leases}\n\n## Recent Artifacts\n\n${artifactLines}${noteBlock}`
 }
 export function renderStartHere(manifest: Manifest, workflow: WorkflowState, pivot: PivotState, options: StartHereOptions = {}): string {
   const ticket = getTicket(manifest, workflow.active_ticket)
@@ -1859,8 +2065,10 @@ export function renderStartHere(manifest: Manifest, workflow: WorkflowState, piv
     : null
   const activeTicketNeedsHistoricalReconciliation = ticketNeedsHistoricalReconciliation(ticket)
   const activeTicketNeedsTrustRestoration = ticketNeedsTrustRestoration(ticket, workflow)
+  const activeTicketNeedsAcceptanceRefresh = ticketState.needs_acceptance_refresh === true
   const suspectDone = processVerification.done_but_not_fully_trusted
   const reverification = manifest.tickets.filter((item) => getTicketWorkflowState(workflow, item.id).needs_reverification)
+  const acceptanceRefresh = manifest.tickets.filter((item) => ticketNeedsAcceptanceRefresh(workflow, item.id))
   const blockedDependents = blockedDependentTickets(manifest, ticket.id)
   const splitChildren = openSplitScopeChildren(manifest, ticket.id)
   const verifierLabel = options.backlogVerifierAgent ? `\`${options.backlogVerifierAgent}\`` : "the backlog verifier"
@@ -1877,7 +2085,7 @@ export function renderStartHere(manifest: Manifest, workflow: WorkflowState, piv
         ? "pivot follow-up required"
       : repairFollowOnPending
         ? "repair follow-up required"
-        : processVerification.pending || activeTicketNeedsTrustRestoration || activeTicketNeedsHistoricalReconciliation
+        : processVerification.pending || activeTicketNeedsTrustRestoration || activeTicketNeedsHistoricalReconciliation || acceptanceRefresh.length > 0
           ? "workflow verification pending"
           : "ready for continued development"
   )
@@ -1890,6 +2098,8 @@ export function renderStartHere(manifest: Manifest, workflow: WorkflowState, piv
             : "Complete the remaining pivot follow-on work and republish the restart surfaces before resuming normal ticket lifecycle work.")
       : repairFollowOnPending
         ? (repairBlocker || (repairNextStage ? `Complete the required repair follow-on stage \`${repairNextStage}\` before resuming normal ticket lifecycle work.` : "Complete the required repair follow-on stages before resuming normal ticket lifecycle work."))
+          : activeTicketNeedsAcceptanceRefresh
+            ? `Keep ${ticket.id} as the foreground ticket, but refresh or re-affirm its canonical acceptance criteria through ticket_update before relying on review, QA, smoke-test, or closeout.`
           : splitChildren.length > 0
             ? `Keep ${ticket.id} open as a split parent and continue the child ticket lane${splitChildren.length > 1 ? "s" : ""}: ${splitChildren.map((item) => item.id).join(", ")}.`
             : ticket.status !== "done"
@@ -1919,8 +2129,10 @@ export function renderStartHere(manifest: Manifest, workflow: WorkflowState, piv
     sourceFollowUpPending ? "- Managed repair converged, but source-layer follow-up still remains in the ticket graph." : null,
     activeTicketNeedsHistoricalReconciliation ? "- Historical lineage remains contradictory until ticket_reconcile repairs the superseded invalidated ticket graph." : null,
     activeTicketNeedsTrustRestoration || processVerification.pending ? "- Historical completion should not be treated as fully trusted until pending process verification or explicit reverification is cleared." : null,
+    activeTicketNeedsAcceptanceRefresh ? `- ${ticket.id} still needs an explicit canonical acceptance refresh before downstream review and closeout should be trusted.` : null,
     processVerification.clearable_now ? "- The workflow still records pending process verification even though no done tickets remain affected; clear the workflow flag before relying on a clean-state restart narrative." : null,
     suspectDone.length > 0 ? `- Some done tickets are not fully trusted yet: ${suspectDone.map((item) => item.id).join(", ")}.` : null,
+    acceptanceRefresh.length > 0 ? `- Some tickets still need canonical acceptance refresh: ${acceptanceRefresh.map((item) => item.id).join(", ")}.` : null,
     splitChildren.length > 0 ? `- ${ticket.id} is an open split parent; child ticket${splitChildren.length > 1 ? "s" : ""} ${splitChildren.map((item) => item.id).join(", ")} remain the active foreground work.` : null,
     blockedDependents.length > 0 && ticket.status !== "done" ? `- Downstream tickets ${blockedDependents.map((item) => item.id).join(", ")} remain formally blocked until ${ticket.id} reaches done.` : null,
   ].filter((line): line is string => Boolean(line)).join("\n") || "- None recorded."

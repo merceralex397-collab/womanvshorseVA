@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-04-15T20:32:09Z",
+  "repo_root": "/home/rowan/womanvshorseVA",
+  "finding_count": 0,
+  "finding_codes": [],
+  "source_findings": [],
+  "result_state": "no validated failures found",
+  "diagnosis_kind": "post_repair_verification",
+  "evidence_mode": "current_state_only",
+  "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:28002026c917",
+  "report_files": {
+    "report_1": "01-initial-codebase-review.md",
+    "report_2": "02-scafforge-process-failures.md",
+    "report_3": "03-scafforge-prevention-actions.md",
+    "report_4": "04-live-repo-repair-plan.md"
+  },
+  "disposition_bundle_file": "disposition-bundle.json",
+  "disposition_bundle": {
+    "version": 1,
+    "generated_at": "2026-04-15T20:32:09Z",
+    "repo_root": "/home/rowan/womanvshorseVA",
+    "audit_package_commit": "43aac98c73ce6a81653e88291215550ebfd3e709+dirty:28002026c917",
+    "allowed_classes": [
+      "managed_blocker",
+      "manual_prerequisite_blocker",
+      "source_follow_up",
+      "process_state_only",
+      "advisory"
+    ],
+    "finding_count": 0,
+    "findings": [],
+    "counts": {
+      "managed_blocker": 0,
+      "manual_prerequisite_blocker": 0,
+      "source_follow_up": 0,
+      "process_state_only": 0,
+      "advisory": 0
+    },
+    "shadow_mode_deltas": []
+  },
+  "ticket_recommendations": [],
+  "package_work_required_first": false,
+  "recommended_next_step": "done"
+}

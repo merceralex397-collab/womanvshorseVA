@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "stack_label": "godot-2d-android-game",
+  "deliverable_kind": "Android game APK \u2014 woman fights waves of enemy horses",
+  "placeholder_policy": "Procedural/programmatic sprites acceptable. Colored shapes with basic animations. No placeholder art in final build.",
+  "art_style": "stylized-2d",
+  "target_platform": "android",
+  "route_mode": "single-route",
+  "content_source_plan": "Procedural generation \u2014 sprites created programmatically via GDScript. No external assets.",
+  "licensing_or_provenance_constraints": "No external assets used. All content is procedurally generated.",
+  "finish_acceptance_signals": "APK compiles and installs. All waves playable. Touch controls work. Score tracking functions.",
+  "routes": {
+    "characters": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    },
+    "environments": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    },
+    "props": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    },
+    "ui": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    },
+    "audio": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    },
+    "vfx": {
+      "primary": "godot-native-authored",
+      "fallback": "procedural-repo-authored"
+    }
+  },
+  "route_families": [
+    "godot_native"
+  ],
+  "brief_targets": [],
+  "provenance_tracking": true,
+  "provenance_requirements": {
+    "machine_readable": "assets/pipeline.json",
+    "human_readable": "assets/PROVENANCE.md",
+    "briefs_dir": "assets/briefs",
+    "previews_dir": "assets/previews",
+    "workfiles_dir": "assets/workfiles",
+    "licenses_dir": "assets/licenses",
+    "import_reports_dir": "assets/import-reports",
+    "route_specific_finish_proof_required": true
+  },
+  "tool_license_policy": {
+    "allow_open_source_tools": true,
+    "allow_commercial_tools": false,
+    "notes": "Record tool licenses separately from model/checkpoint licenses when AI-assisted generation is used."
+  },
+  "model_license_policy": {
+    "allow_open_weights": true,
+    "allow_noncommercial_weights": false,
+    "notes": "If AI-assisted generation is used, record the exact model or checkpoint license separately from the tool stack."
+  },
+  "license_filter": [
+    "CC0",
+    "CC-BY",
+    "MIT",
+    "OFL"
+  ],
+  "texture_max_size": 1024,
+  "model_max_tris": 5000,
+  "initialized_by": "skills/asset-pipeline/scripts/init_asset_pipeline.py"
+}
